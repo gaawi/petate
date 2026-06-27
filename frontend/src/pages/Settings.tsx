@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api } from '../api'
 import type { FamilyMember, Location } from '../types'
 import Modal from '../components/Modal'
+import { useAuth } from '../lib/auth'
 
 const COLORS = ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16']
 const ROLES = [
@@ -12,6 +13,7 @@ const ROLES = [
 ]
 
 export default function Settings() {
+  const { session, signOut } = useAuth()
   const [members, setMembers] = useState<FamilyMember[]>([])
   const [locations, setLocations] = useState<Location[]>([])
   const [showMember, setShowMember] = useState(false)
@@ -132,6 +134,23 @@ export default function Settings() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Account */}
+      <section>
+        <h2 className="text-base font-semibold text-gray-800 mb-3">🔒 Cuenta</h2>
+        <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-gray-900 truncate">{session?.user?.email}</div>
+            <div className="text-xs text-gray-400">Sesión iniciada</div>
+          </div>
+          <button
+            onClick={() => signOut()}
+            className="px-3 py-1.5 bg-red-50 text-red-600 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors flex-shrink-0"
+          >
+            Cerrar sesión
+          </button>
         </div>
       </section>
 

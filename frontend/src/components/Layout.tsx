@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { useAuth } from '../lib/auth'
 
 const navItems = [
   { to: '/', label: 'Inicio', emoji: '🏠', exact: true },
@@ -10,6 +11,7 @@ const navItems = [
 ]
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { signOut } = useAuth()
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar desktop */}
@@ -42,6 +44,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </NavLink>
           ))}
         </nav>
+        <div className="px-3 py-4 border-t border-gray-100">
+          <button
+            onClick={() => signOut()}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+          >
+            <span className="text-lg">🚪</span>
+            Cerrar sesión
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}
