@@ -6,6 +6,7 @@ import { CATEGORIES, USE_TYPES, CONDITIONS, SEASONS, FIT_OPTIONS } from '../type
 import GarmentCard from '../components/GarmentCard'
 import GarmentForm from '../components/GarmentForm'
 import Modal from '../components/Modal'
+import { Plus, Search, ChevronDown } from 'lucide-react'
 
 export default function Garments() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -81,28 +82,26 @@ export default function Garments() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Ropa</h1>
+          <h1 className="ios-large-title">Ropa</h1>
           <p className="text-sm text-gray-400">{garments.length} prendas</p>
         </div>
         <button
           onClick={() => { setEditing(null); setShowForm(true) }}
-          className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+          className="ios-btn-primary flex items-center gap-1.5"
         >
-          <span className="text-lg">+</span> Añadir
+          <Plus className="w-5 h-5" /> Añadir
         </button>
       </div>
 
       {/* Search */}
       <div className="relative mb-3">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] text-gray-400" />
         <input
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar por nombre, marca..."
-          className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="ios-field w-full pl-10"
         />
       </div>
 
@@ -157,7 +156,7 @@ export default function Garments() {
           <div className="text-5xl mb-3">👕</div>
           <div className="font-medium">No hay prendas{activeFilterCount > 0 ? ' con esos filtros' : ''}</div>
           {activeFilterCount > 0 && (
-            <button onClick={clearFilters} className="mt-2 text-indigo-600 text-sm hover:underline">
+            <button onClick={clearFilters} className="mt-2 text-brand-600 text-sm hover:underline">
               Limpiar filtros
             </button>
           )}
@@ -212,18 +211,16 @@ function FilterChip({
       <button
         onClick={() => setOpen(!open)}
         className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1 ${
-          value ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          value ? 'bg-brand-600 text-white' : 'bg-black/[0.05] text-gray-600'
         }`}
       >
         {selected ? selected.label : label}
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <ChevronDown className="w-3.5 h-3.5" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute top-full left-0 mt-1 bg-white border border-gray-100 rounded-xl shadow-lg z-20 min-w-40 max-h-64 overflow-y-auto">
+          <div className="ios-card absolute top-full left-0 mt-1 rounded-xl shadow-lg z-20 min-w-40 max-h-64 overflow-y-auto">
             <button
               onClick={() => { onChange(''); setOpen(false) }}
               className="block w-full text-left px-3 py-2 text-xs text-gray-500 hover:bg-gray-50"
@@ -235,7 +232,7 @@ function FilterChip({
                 key={o.value}
                 onClick={() => { onChange(o.value === value ? '' : o.value); setOpen(false) }}
                 className={`block w-full text-left px-3 py-2 text-xs transition-colors ${
-                  o.value === value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                  o.value === value ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 {o.label}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { api } from '../api'
 import type { Trip, Suitcase } from '../types'
 import Modal from '../components/Modal'
+import { MapPin, Calendar, Luggage, SquarePen, Trash2, Plane, Plus, Check } from 'lucide-react'
 
 export default function Trips() {
   const [trips, setTrips] = useState<Trip[]>([])
@@ -57,21 +58,21 @@ export default function Trips() {
   return (
     <div className="p-4 md:p-6 max-w-3xl">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Viajes</h1>
+        <h1 className="ios-large-title">Viajes</h1>
         <button
           onClick={openAdd}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
+          className="ios-btn-primary"
         >
-          + Nuevo viaje
+          <Plus className="w-4 h-4" /> Nuevo viaje
         </button>
       </div>
 
       {trips.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <div className="text-5xl mb-3">✈️</div>
+          <Plane className="w-10 h-10 text-gray-300 mx-auto mb-3" />
           <div className="font-medium">No hay viajes planificados</div>
-          <button onClick={openAdd} className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm hover:bg-indigo-700">
-            Planificar un viaje
+          <button onClick={openAdd} className="ios-btn-primary mt-3 mx-auto">
+            <Plus className="w-4 h-4" /> Planificar un viaje
           </button>
         </div>
       ) : (
@@ -79,7 +80,7 @@ export default function Trips() {
           {trips.map(trip => {
             const status = getTripStatus(trip)
             return (
-              <div key={trip.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+              <div key={trip.id} className="ios-card overflow-hidden">
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
@@ -90,11 +91,11 @@ export default function Trips() {
                         </span>
                       </div>
                       {trip.destination && (
-                        <div className="text-sm text-gray-500 mt-0.5">📍 {trip.destination}</div>
+                        <div className="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5"><MapPin className="w-[18px]" /> {trip.destination}</div>
                       )}
                       {(trip.start_date || trip.end_date) && (
-                        <div className="text-sm text-gray-400 mt-0.5">
-                          📅 {trip.start_date || '?'} {trip.end_date ? `→ ${trip.end_date}` : ''}
+                        <div className="text-sm text-gray-400 mt-0.5 flex items-center gap-1.5">
+                          <Calendar className="w-[18px]" /> {trip.start_date || '?'} {trip.end_date ? `→ ${trip.end_date}` : ''}
                         </div>
                       )}
                       {trip.notes && (
@@ -102,8 +103,8 @@ export default function Trips() {
                       )}
                     </div>
                     <div className="flex gap-1 flex-shrink-0">
-                      <button onClick={() => openEdit(trip)} className="p-1.5 text-gray-400 hover:text-indigo-600 transition-colors">✏️</button>
-                      <button onClick={() => handleDelete(trip)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors">🗑️</button>
+                      <button onClick={() => openEdit(trip)} className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-black/5"><SquarePen className="w-[18px]" /></button>
+                      <button onClick={() => handleDelete(trip)} className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-black/5"><Trash2 className="w-[18px]" /></button>
                     </div>
                   </div>
 
@@ -119,12 +120,12 @@ export default function Trips() {
                             onClick={() => toggleSuitcase(trip, s.id)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
                               linked
-                                ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                                ? 'border-brand-300 bg-brand-50 text-brand-700'
                                 : 'border-gray-200 text-gray-500 hover:border-gray-300'
                             }`}
                           >
-                            🧳 {s.name}
-                            {linked && <span className="text-indigo-400">✓</span>}
+                            <Luggage className="w-3.5" /> {s.name}
+                            {linked && <Check className="w-3.5" />}
                           </button>
                         )
                       })}
@@ -140,8 +141,8 @@ export default function Trips() {
                   <div className="bg-gray-50 px-4 py-2 border-t border-gray-100">
                     <div className="text-xs text-gray-400">
                       {trip.suitcases.map(s => (
-                        <span key={s.id} className="mr-3">
-                          🧳 {s.name} {s.garment_count ? `(${s.garment_count} prendas)` : ''}
+                        <span key={s.id} className="mr-3 inline-flex items-center gap-1">
+                          <Luggage className="w-3.5" /> {s.name} {s.garment_count ? `(${s.garment_count} prendas)` : ''}
                         </span>
                       ))}
                     </div>
@@ -164,7 +165,7 @@ export default function Trips() {
                 value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Ej: Verano en España"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
                 autoFocus
               />
             </div>
@@ -175,7 +176,7 @@ export default function Trips() {
                 value={form.destination}
                 onChange={e => setForm(f => ({ ...f, destination: e.target.value }))}
                 placeholder="Ej: Madrid, España"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -185,7 +186,7 @@ export default function Trips() {
                   type="date"
                   value={form.start_date}
                   onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="ios-field"
                 />
               </div>
               <div>
@@ -194,7 +195,7 @@ export default function Trips() {
                   type="date"
                   value={form.end_date}
                   onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="ios-field"
                 />
               </div>
             </div>
@@ -205,12 +206,12 @@ export default function Trips() {
                 onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                 rows={2}
                 placeholder="Notas sobre el viaje..."
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                className="ios-field resize-none"
               />
             </div>
             <div className="flex gap-3 pt-2">
-              <button onClick={() => { setShowAdd(false); setEditing(null) }} className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-700">Cancelar</button>
-              <button onClick={handleSave} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm">Guardar</button>
+              <button onClick={() => { setShowAdd(false); setEditing(null) }} className="flex-1 py-2.5 rounded-xl bg-black/[0.06] text-gray-700 font-semibold">Cancelar</button>
+              <button onClick={handleSave} className="ios-btn-primary flex-1 py-2.5">Guardar</button>
             </div>
           </div>
         </Modal>

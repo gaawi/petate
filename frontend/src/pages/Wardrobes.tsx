@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { DoorOpen, MapPin, Plus, SquarePen, Trash2 } from 'lucide-react'
 import { api } from '../api'
 import type { Wardrobe, Location, Garment, FamilyMember, Suitcase } from '../types'
 import Modal from '../components/Modal'
@@ -81,12 +82,13 @@ export default function Wardrobes() {
   return (
     <div className="p-4 md:p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Armarios</h1>
+        <h1 className="ios-large-title">Armarios</h1>
         <button
           onClick={() => { setForm({ name: '', location_id: '' }); setEditWardrobe(null); setShowAddWardrobe(true) }}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
+          className="ios-btn-primary"
         >
-          + Nuevo armario
+          <Plus className="w-4 h-4" />
+          Nuevo armario
         </button>
       </div>
 
@@ -95,23 +97,23 @@ export default function Wardrobes() {
         <div className="md:col-span-1 space-y-4">
           {Object.entries(byLocation).map(([locName, wds]) => (
             <div key={locName}>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-1">
-                📍 {locName}
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-1 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5" /> {locName}
               </div>
               <div className="space-y-2">
                 {wds.map(w => (
                   <div
                     key={w.id}
                     onClick={() => loadGarments(w)}
-                    className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                    className={`ios-card p-3 cursor-pointer transition-all ${
                       selected?.id === w.id
-                        ? 'border-indigo-300 bg-indigo-50'
-                        : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm'
+                        ? 'bg-brand-50 ring-1 ring-brand-200'
+                        : 'hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">🚪</span>
+                        <DoorOpen className="w-5 h-5 text-gray-400" />
                         <div>
                           <div className="font-medium text-sm text-gray-900">{w.name}</div>
                           <div className="text-xs text-gray-400">{w.garment_count ?? 0} prendas</div>
@@ -120,15 +122,15 @@ export default function Wardrobes() {
                       <div className="flex gap-1">
                         <button
                           onClick={e => { e.stopPropagation(); setForm({ name: w.name, location_id: String(w.location_id || '') }); setEditWardrobe(w); setShowAddWardrobe(true) }}
-                          className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-black/5"
                         >
-                          ✏️
+                          <SquarePen className="w-[18px] h-[18px]" />
                         </button>
                         <button
                           onClick={e => { e.stopPropagation(); handleDeleteWardrobe(w) }}
-                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-black/5"
                         >
-                          🗑️
+                          <Trash2 className="w-[18px] h-[18px]" />
                         </button>
                       </div>
                     </div>
@@ -148,21 +150,26 @@ export default function Wardrobes() {
             <>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="font-semibold text-gray-900">🚪 {selected.name}</h2>
+                  <h2 className="font-semibold text-gray-900 flex items-center gap-1.5">
+                    <DoorOpen className="w-5 h-5 text-gray-400" /> {selected.name}
+                  </h2>
                   {selected.location_name && (
-                    <p className="text-sm text-gray-400">📍 {selected.location_name}</p>
+                    <p className="text-sm text-gray-400 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5" /> {selected.location_name}
+                    </p>
                   )}
                 </div>
                 <button
                   onClick={() => setShowAddGarment(true)}
-                  className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl text-sm font-medium hover:bg-indigo-100 transition-colors"
+                  className="bg-brand-50 text-brand-700 rounded-xl px-3 py-1.5 font-medium flex items-center gap-1"
                 >
-                  + Añadir prenda aquí
+                  <Plus className="w-4 h-4" />
+                  Añadir prenda aquí
                 </button>
               </div>
               {garments.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
-                  <div className="text-4xl mb-2">🚪</div>
+                  <DoorOpen className="w-10 h-10 text-gray-300 mx-auto mb-2" />
                   <div>Este armario está vacío</div>
                 </div>
               ) : (
@@ -197,7 +204,7 @@ export default function Wardrobes() {
                 value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Ej: Armario principal"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
                 autoFocus
               />
             </div>
@@ -206,15 +213,15 @@ export default function Wardrobes() {
               <select
                 value={form.location_id}
                 onChange={e => setForm(f => ({ ...f, location_id: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
               >
                 <option value="">Sin ubicación</option>
                 {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
               </select>
             </div>
             <div className="flex gap-3 pt-2">
-              <button onClick={() => { setShowAddWardrobe(false); setEditWardrobe(null) }} className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 hover:bg-gray-50">Cancelar</button>
-              <button onClick={handleSaveWardrobe} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm hover:bg-indigo-700">Guardar</button>
+              <button onClick={() => { setShowAddWardrobe(false); setEditWardrobe(null) }} className="flex-1 py-2.5 rounded-xl bg-black/[0.06] text-gray-700 font-semibold">Cancelar</button>
+              <button onClick={handleSaveWardrobe} className="ios-btn-primary flex-1 py-2.5">Guardar</button>
             </div>
           </div>
         </Modal>

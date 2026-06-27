@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Luggage } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 import { isSupabaseConfigured } from '../lib/supabase'
 
@@ -23,10 +24,12 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-sky-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 to-white p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-2">🧳</div>
+          <div className="w-16 h-16 rounded-2xl bg-brand-600 flex items-center justify-center mx-auto mb-3">
+            <Luggage className="w-8 h-8 text-white" strokeWidth={2.2} />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900">Petate</h1>
           <p className="text-gray-500 text-sm mt-1">Inventario de ropa familiar</p>
         </div>
@@ -38,7 +41,7 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="ios-card p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
@@ -47,7 +50,7 @@ export default function Login() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="tu@email.com"
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="ios-field"
               autoFocus
             />
           </div>
@@ -59,14 +62,14 @@ export default function Login() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="ios-field"
             />
           </div>
           {error && <div className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</div>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            className="ios-btn-primary w-full py-2.5"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>

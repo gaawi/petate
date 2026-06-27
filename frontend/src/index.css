@@ -2,9 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===========================================================================
+   Tema tipo iOS (estética app nativa de Apple)
+   =========================================================================== */
+:root {
+  --ios-bg: #f2f2f7;          /* systemGroupedBackground */
+  --ios-bg-elevated: #ffffff;
+  --ios-label: #1c1c1e;
+  --ios-secondary: #8a8a8e;   /* secondaryLabel */
+  --ios-separator: rgba(60, 60, 67, 0.12);
+  --ios-blue: #007aff;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   body {
-    @apply bg-gray-50 text-gray-900;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+      system-ui, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--ios-bg);
+    color: var(--ios-label);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Quita el zoom de iOS al enfocar inputs (fuente >= 16px) */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /* Tarjeta / superficie elevada */
+  .ios-card {
+    @apply bg-white rounded-2xl;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 8px rgba(0, 0, 0, 0.03);
+  }
+
+  /* Lista agrupada estilo Ajustes de iOS */
+  .ios-group {
+    @apply bg-white rounded-2xl overflow-hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+  .ios-row {
+    @apply flex items-center gap-3 px-4 py-3 min-h-[44px];
+  }
+  .ios-divider {
+    border-top: 1px solid var(--ios-separator);
+  }
+
+  /* Botones */
+  .ios-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold
+           transition-transform active:scale-[0.97] select-none;
+  }
+  .ios-btn-primary {
+    @apply ios-btn bg-brand-600 text-white px-4 py-2.5;
+  }
+  .ios-btn-secondary {
+    @apply ios-btn bg-black/[0.06] text-brand-600 px-4 py-2.5;
+  }
+  .ios-btn-ghost {
+    @apply ios-btn text-brand-600 px-3 py-2;
+  }
+
+  /* Campo de formulario */
+  .ios-field {
+    @apply w-full px-3.5 py-2.5 bg-black/[0.04] rounded-xl text-[16px]
+           placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400/60
+           transition-shadow;
+  }
+
+  /* "Chip" seleccionable (pill) */
+  .ios-chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
+           bg-black/[0.05] text-gray-600 transition-colors active:scale-[0.97];
+  }
+  .ios-chip-active {
+    @apply bg-brand-600 text-white;
+  }
+
+  /* Titulo grande iOS */
+  .ios-large-title {
+    @apply text-[32px] leading-tight font-bold tracking-[-0.02em] text-gray-900;
   }
 }
 
@@ -15,4 +101,30 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .pb-safe { padding-bottom: var(--safe-bottom); }
+  .pt-safe { padding-top: var(--safe-top); }
+  .glass {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
 }
+
+/* Animaciones de hoja (sheet) y backdrop */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes sheet-center {
+  from { transform: translateY(8px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-sheet-up { animation: sheet-up 0.32s cubic-bezier(0.32, 0.72, 0, 1); }
+.animate-sheet-center { animation: sheet-center 0.25s cubic-bezier(0.32, 0.72, 0, 1); }
+.animate-fade-in { animation: fade-in 0.2s ease-out; }

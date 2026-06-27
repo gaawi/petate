@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { ImagePlus, X, Star } from 'lucide-react'
 import type { Garment, FamilyMember, Wardrobe, Suitcase } from '../types'
 import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS } from '../types'
 import { api } from '../api'
@@ -37,7 +38,7 @@ function OptionGroup<T extends string>({
           onClick={() => onChange(o.value)}
           className={`px-2.5 py-1 rounded-lg border text-sm transition-all ${
             value === o.value
-              ? 'border-indigo-500 bg-indigo-50 text-indigo-700 font-medium'
+              ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
               : 'border-gray-200 text-gray-600 hover:border-gray-300'
           } ${small ? 'text-xs px-2 py-0.5' : ''}`}
         >
@@ -127,10 +128,10 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Photo upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Foto</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Foto</label>
         <div
           className={`relative border-2 border-dashed rounded-xl overflow-hidden transition-colors ${
-            dragOver ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200 hover:border-gray-300'
+            dragOver ? 'border-brand-400 bg-brand-50' : 'border-gray-200 hover:border-gray-300'
           }`}
           style={{ height: form.photo_path ? 'auto' : '140px' }}
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
@@ -149,9 +150,9 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
               <button
                 type="button"
                 onClick={e => { e.stopPropagation(); set('photo_path', '') }}
-                className="absolute top-2 right-2 p-1 bg-white rounded-full shadow text-red-500 hover:text-red-700"
+                className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow text-red-500 hover:text-red-700"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
           ) : (
@@ -160,9 +161,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
                 <div className="text-sm">Subiendo...</div>
               ) : (
                 <>
-                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <ImagePlus className="w-8 h-8 text-gray-400" />
                   <span className="text-sm">Haz clic o arrastra una foto</span>
                 </>
               )}
@@ -181,31 +180,31 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
       {/* Name + brand */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Nombre *</label>
           <input
             type="text"
             required
             value={form.name}
             onChange={e => set('name', e.target.value)}
             placeholder="Ej: Camiseta azul Nike"
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="ios-field"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Marca</label>
           <input
             type="text"
             value={form.brand}
             onChange={e => set('brand', e.target.value)}
             placeholder="Ej: Zara, Nike..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="ios-field"
           />
         </div>
       </div>
 
       {/* Category */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de prenda</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Tipo de prenda</label>
         <div className="flex flex-wrap gap-1.5">
           {CATEGORIES.map(c => (
             <button
@@ -214,7 +213,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
               onClick={() => set('category', c.value)}
               className={`px-2 py-1 rounded-lg border text-xs transition-all ${
                 form.category === c.value
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700 font-medium'
+                  ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
                   : 'border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
@@ -226,13 +225,13 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
 
       {/* Owner */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Dueño/a</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Dueño/a</label>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => set('owner_id', '')}
             className={`px-3 py-1.5 rounded-xl border text-sm transition-all ${
-              form.owner_id === '' ? 'border-indigo-500 bg-indigo-50 text-indigo-700 font-medium' : 'border-gray-200 text-gray-500'
+              form.owner_id === '' ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium' : 'border-gray-200 text-gray-500'
             }`}
           >
             Todos
@@ -255,7 +254,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
 
       {/* Storage location */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Ubicación</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Ubicación</label>
         <div className="flex gap-2 mb-2">
           {[
             { value: 'wardrobe', label: '🚪 Armario' },
@@ -268,7 +267,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
               onClick={() => set('storage_type', opt.value)}
               className={`px-3 py-1.5 rounded-xl border text-sm transition-all ${
                 form.storage_type === opt.value
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700 font-medium'
+                  ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
                   : 'border-gray-200 text-gray-600'
               }`}
             >
@@ -280,7 +279,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
           <select
             value={form.wardrobe_id}
             onChange={e => set('wardrobe_id', e.target.value ? Number(e.target.value) : '')}
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="ios-field"
           >
             <option value="">Selecciona un armario</option>
             {wardrobes.map(w => (
@@ -294,7 +293,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
           <select
             value={form.suitcase_id}
             onChange={e => set('suitcase_id', e.target.value ? Number(e.target.value) : '')}
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="ios-field"
           >
             <option value="">Selecciona una maleta</option>
             {suitcases.map(s => (
@@ -308,40 +307,40 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
 
       {/* Season */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Temporada</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Temporada</label>
         <OptionGroup options={SEASONS} value={form.season} onChange={v => set('season', v)} />
       </div>
 
       {/* Use type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Para qué sirve</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Para qué sirve</label>
         <OptionGroup options={USE_TYPES} value={form.use_type} onChange={v => set('use_type', v)} />
       </div>
 
       {/* Condition */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Estado</label>
         <OptionGroup options={CONDITIONS} value={form.condition} onChange={v => set('condition', v)} />
       </div>
 
       {/* Fit */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Talla / Cómo me queda</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Talla / Cómo me queda</label>
         <OptionGroup options={FIT_OPTIONS} value={form.fit} onChange={v => set('fit', v)} />
       </div>
 
       {/* Rating */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Valoración</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Valoración</label>
         <div className="flex gap-2 items-center">
           {[1, 2, 3, 4, 5].map(i => (
             <button
               key={i}
               type="button"
               onClick={() => set('rating', i)}
-              className={`text-2xl transition-transform hover:scale-110 ${i <= form.rating ? 'text-amber-400' : 'text-gray-200'}`}
+              className="transition-transform hover:scale-110"
             >
-              ★
+              <Star className={`w-7 h-7 ${i <= form.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
             </button>
           ))}
           <span className="text-sm text-gray-400 ml-2">
@@ -353,23 +352,23 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
       {/* Color + Notes */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
           <input
             type="text"
             value={form.color}
             onChange={e => set('color', e.target.value)}
             placeholder="Ej: azul marino"
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="ios-field"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Notas</label>
           <input
             type="text"
             value={form.notes}
             onChange={e => set('notes', e.target.value)}
             placeholder="Notas adicionales..."
-            className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="ios-field"
           />
         </div>
       </div>
@@ -379,14 +378,14 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex-1 py-2.5 rounded-xl bg-black/[0.06] text-gray-700 font-semibold"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={saving || !form.name.trim()}
-          className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="ios-btn-primary flex-1 py-2.5 disabled:opacity-50"
         >
           {saving ? 'Guardando...' : garment ? 'Actualizar' : 'Añadir prenda'}
         </button>

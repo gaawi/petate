@@ -35,9 +35,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">¡Hola! 👋</h1>
+        <h1 className="ios-large-title text-gray-900">¡Hola! 👋</h1>
         <p className="text-gray-500 mt-1">Tienes <strong>{stats.total}</strong> prendas en tu inventario</p>
       </div>
 
@@ -49,7 +49,7 @@ export default function Dashboard() {
             <Link
               key={m.id}
               to={`/ropa?owner_id=${m.id}`}
-              className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-center"
+              className="ios-card p-4 hover:shadow-md transition-shadow text-center"
             >
               <div
                 className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-xl font-bold"
@@ -67,7 +67,7 @@ export default function Dashboard() {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Por tipo */}
-        <section className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <section className="ios-card rounded-2xl p-5">
           <h2 className="text-base font-semibold text-gray-700 mb-4">Por tipo de prenda</h2>
           <div className="space-y-2">
             {stats.byCategory.slice(0, 8).map(item => {
@@ -78,11 +78,11 @@ export default function Dashboard() {
                   <span className="text-lg w-6 text-center">{cat.emoji}</span>
                   <div className="flex-1">
                     <div className="flex justify-between text-xs text-gray-600 mb-0.5">
-                      <span className="group-hover:text-indigo-600 transition-colors">{cat.label}</span>
+                      <span className="group-hover:text-brand-600 transition-colors">{cat.label}</span>
                       <span className="font-medium">{item.count}</span>
                     </div>
                     <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-indigo-400 rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-brand-400 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 </Link>
@@ -93,14 +93,14 @@ export default function Dashboard() {
 
         <div className="space-y-6">
           {/* Por uso */}
-          <section className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <section className="ios-card rounded-2xl p-5">
             <h2 className="text-base font-semibold text-gray-700 mb-3">Por uso</h2>
             <div className="flex flex-wrap gap-2">
               {stats.byUseType.map(item => (
                 <Link
                   key={item.use_type}
                   to={`/ropa?use_type=${item.use_type}`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-indigo-50 rounded-xl text-sm text-gray-700 hover:text-indigo-700 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.05] hover:bg-brand-50 rounded-xl text-sm text-gray-700 transition-colors"
                 >
                   {useTypeLabels[item.use_type] || item.use_type}
                   <span className="font-bold text-gray-900">{item.count}</span>
@@ -110,14 +110,14 @@ export default function Dashboard() {
           </section>
 
           {/* Por temporada */}
-          <section className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <section className="ios-card rounded-2xl p-5">
             <h2 className="text-base font-semibold text-gray-700 mb-3">Por temporada</h2>
             <div className="flex flex-wrap gap-2">
               {stats.bySeason.map(item => (
                 <Link
                   key={item.season}
                   to={`/ropa?season=${item.season}`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-indigo-50 rounded-xl text-sm text-gray-700 hover:text-indigo-700 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.05] hover:bg-brand-50 rounded-xl text-sm text-gray-700 transition-colors"
                 >
                   {seasonLabels[item.season] || item.season}
                   <span className="font-bold text-gray-900">{item.count}</span>
@@ -127,7 +127,7 @@ export default function Dashboard() {
           </section>
 
           {/* Quick links */}
-          <section className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <section className="ios-card rounded-2xl p-5">
             <h2 className="text-base font-semibold text-gray-700 mb-3">Accesos rápidos</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
@@ -139,7 +139,7 @@ export default function Dashboard() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="px-3 py-2 bg-gray-50 hover:bg-indigo-50 rounded-xl text-xs text-gray-700 hover:text-indigo-700 transition-colors text-center"
+                  className="px-3 py-2 bg-black/[0.05] hover:bg-brand-50 rounded-xl text-xs text-gray-700 transition-colors text-center"
                 >
                   {link.label}
                 </Link>

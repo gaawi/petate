@@ -3,6 +3,7 @@ import { api } from '../api'
 import type { FamilyMember, Location } from '../types'
 import Modal from '../components/Modal'
 import { useAuth } from '../lib/auth'
+import { Users, MapPin, Lock, House, SquarePen, Trash2, Plus, LogOut } from 'lucide-react'
 
 const COLORS = ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16']
 const ROLES = [
@@ -71,35 +72,46 @@ export default function Settings() {
 
   return (
     <div className="p-4 md:p-6 max-w-2xl space-y-8">
-      <h1 className="text-xl font-bold text-gray-900">Ajustes</h1>
+      <h1 className="ios-large-title">Ajustes</h1>
 
       {/* Family members */}
       <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-800">👨‍👩‍👧‍👦 Familia</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 px-1">
+            <Users className="w-4 h-4" />
+            Familia
+          </h2>
           <button
             onClick={openAddMember}
-            className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl text-sm font-medium hover:bg-indigo-100 transition-colors"
+            className="flex items-center gap-1 bg-brand-50 text-brand-700 rounded-xl px-3 py-1.5 font-medium"
           >
-            + Añadir persona
+            <Plus className="w-4 h-4" />
+            Añadir persona
           </button>
         </div>
-        <div className="space-y-2">
-          {members.map(m => (
-            <div key={m.id} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
-                style={{ backgroundColor: m.color }}
-              >
-                {m.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-gray-900">{m.name}</div>
-                <div className="text-xs text-gray-400 capitalize">{ROLES.find(r => r.value === m.role)?.label || m.role} · {m.garment_count ?? 0} prendas</div>
-              </div>
-              <div className="flex gap-1">
-                <button onClick={() => openEditMember(m)} className="p-1.5 text-gray-400 hover:text-indigo-600 transition-colors">✏️</button>
-                <button onClick={() => deleteMember(m)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors">🗑️</button>
+        <div className="ios-group">
+          {members.map((m, i) => (
+            <div key={m.id}>
+              {i > 0 && <div className="ios-divider" />}
+              <div className="ios-row flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+                  style={{ backgroundColor: m.color }}
+                >
+                  {m.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-gray-900">{m.name}</div>
+                  <div className="text-xs text-gray-400 capitalize">{ROLES.find(r => r.value === m.role)?.label || m.role} · {m.garment_count ?? 0} prendas</div>
+                </div>
+                <div className="flex gap-1">
+                  <button onClick={() => openEditMember(m)} className="w-8 h-8 rounded-full text-gray-400 hover:bg-black/5 flex items-center justify-center transition-colors">
+                    <SquarePen className="w-[18px] h-[18px]" />
+                  </button>
+                  <button onClick={() => deleteMember(m)} className="w-8 h-8 rounded-full text-gray-400 hover:bg-black/5 flex items-center justify-center transition-colors">
+                    <Trash2 className="w-[18px] h-[18px]" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -108,29 +120,42 @@ export default function Settings() {
 
       {/* Locations */}
       <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-800">📍 Ubicaciones</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 px-1">
+            <MapPin className="w-4 h-4" />
+            Ubicaciones
+          </h2>
           <button
             onClick={openAddLocation}
-            className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl text-sm font-medium hover:bg-indigo-100 transition-colors"
+            className="flex items-center gap-1 bg-brand-50 text-brand-700 rounded-xl px-3 py-1.5 font-medium"
           >
-            + Añadir ubicación
+            <Plus className="w-4 h-4" />
+            Añadir ubicación
           </button>
         </div>
-        <div className="space-y-2">
-          {locations.map(l => (
-            <div key={l.id} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
-              <div className="text-2xl">🏠</div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-gray-900">{l.name}</div>
-                <div className="text-xs text-gray-400">{l.city}, {l.country}</div>
-                <div className="text-xs text-gray-400">
-                  {l.wardrobe_count ?? 0} armarios · {l.suitcase_count ?? 0} maletas
+        <div className="ios-group">
+          {locations.map((l, i) => (
+            <div key={l.id}>
+              {i > 0 && <div className="ios-divider" />}
+              <div className="ios-row flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center flex-shrink-0">
+                  <House className="w-5 h-5" />
                 </div>
-              </div>
-              <div className="flex gap-1">
-                <button onClick={() => openEditLocation(l)} className="p-1.5 text-gray-400 hover:text-indigo-600 transition-colors">✏️</button>
-                <button onClick={() => deleteLocation(l)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors">🗑️</button>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-gray-900">{l.name}</div>
+                  <div className="text-xs text-gray-400">{l.city}, {l.country}</div>
+                  <div className="text-xs text-gray-400">
+                    {l.wardrobe_count ?? 0} armarios · {l.suitcase_count ?? 0} maletas
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <button onClick={() => openEditLocation(l)} className="w-8 h-8 rounded-full text-gray-400 hover:bg-black/5 flex items-center justify-center transition-colors">
+                    <SquarePen className="w-[18px] h-[18px]" />
+                  </button>
+                  <button onClick={() => deleteLocation(l)} className="w-8 h-8 rounded-full text-gray-400 hover:bg-black/5 flex items-center justify-center transition-colors">
+                    <Trash2 className="w-[18px] h-[18px]" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -139,18 +164,24 @@ export default function Settings() {
 
       {/* Account */}
       <section>
-        <h2 className="text-base font-semibold text-gray-800 mb-3">🔒 Cuenta</h2>
-        <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
-          <div className="min-w-0">
-            <div className="text-sm font-medium text-gray-900 truncate">{session?.user?.email}</div>
-            <div className="text-xs text-gray-400">Sesión iniciada</div>
+        <h2 className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 px-1 mb-2">
+          <Lock className="w-4 h-4" />
+          Cuenta
+        </h2>
+        <div className="ios-group">
+          <div className="ios-row flex items-center justify-between">
+            <div className="min-w-0">
+              <div className="text-sm font-medium text-gray-900 truncate">{session?.user?.email}</div>
+              <div className="text-xs text-gray-400">Sesión iniciada</div>
+            </div>
+            <button
+              onClick={() => signOut()}
+              className="flex items-center gap-1 bg-red-50 text-red-600 rounded-xl px-3 py-1.5 font-medium flex-shrink-0"
+            >
+              <LogOut className="w-4 h-4" />
+              Cerrar sesión
+            </button>
           </div>
-          <button
-            onClick={() => signOut()}
-            className="px-3 py-1.5 bg-red-50 text-red-600 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors flex-shrink-0"
-          >
-            Cerrar sesión
-          </button>
         </div>
       </section>
 
@@ -165,7 +196,7 @@ export default function Settings() {
                 value={mForm.name}
                 onChange={e => setMForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Ej: María"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
                 autoFocus
               />
             </div>
@@ -178,7 +209,7 @@ export default function Settings() {
                     type="button"
                     onClick={() => setMForm(f => ({ ...f, role: r.value }))}
                     className={`px-3 py-1.5 rounded-xl border text-sm transition-all ${
-                      mForm.role === r.value ? 'border-indigo-500 bg-indigo-50 text-indigo-700 font-medium' : 'border-gray-200 text-gray-600'
+                      mForm.role === r.value ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium' : 'border-gray-200 text-gray-600'
                     }`}
                   >
                     {r.label}
@@ -201,8 +232,8 @@ export default function Settings() {
               </div>
             </div>
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setShowMember(false)} className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-700">Cancelar</button>
-              <button onClick={saveMember} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm">Guardar</button>
+              <button onClick={() => setShowMember(false)} className="flex-1 py-2.5 rounded-xl bg-black/[0.06] text-gray-700 font-semibold">Cancelar</button>
+              <button onClick={saveMember} className="ios-btn-primary flex-1 py-2.5">Guardar</button>
             </div>
           </div>
         </Modal>
@@ -219,7 +250,7 @@ export default function Settings() {
                 value={lForm.name}
                 onChange={e => setLForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Ej: Casa Nueva York"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
                 autoFocus
               />
             </div>
@@ -230,7 +261,7 @@ export default function Settings() {
                 value={lForm.city}
                 onChange={e => setLForm(f => ({ ...f, city: e.target.value }))}
                 placeholder="Ej: Nueva York"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
               />
             </div>
             <div>
@@ -240,12 +271,12 @@ export default function Settings() {
                 value={lForm.country}
                 onChange={e => setLForm(f => ({ ...f, country: e.target.value }))}
                 placeholder="Ej: Estados Unidos"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="ios-field"
               />
             </div>
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setShowLocation(false)} className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-700">Cancelar</button>
-              <button onClick={saveLocation} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm">Guardar</button>
+              <button onClick={() => setShowLocation(false)} className="flex-1 py-2.5 rounded-xl bg-black/[0.06] text-gray-700 font-semibold">Cancelar</button>
+              <button onClick={saveLocation} className="ios-btn-primary flex-1 py-2.5">Guardar</button>
             </div>
           </div>
         </Modal>
