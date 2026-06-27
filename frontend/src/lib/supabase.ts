@@ -13,9 +13,9 @@ import { createClient } from '@supabase/supabase-js'
 // ============================================================================
 
 const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL || 'PEGA_AQUI_TU_PROJECT_URL'
+  import.meta.env.VITE_SUPABASE_URL || 'https://fkirpxcizfezxrsjfafo.supabase.co'
 const SUPABASE_ANON_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY || 'PEGA_AQUI_TU_ANON_KEY'
+  import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_Y-PjD_VVHe3QtuzTHAVXyg_AqUkJ2j9'
 
 export const isSupabaseConfigured =
   !SUPABASE_URL.startsWith('PEGA_AQUI') && !SUPABASE_ANON_KEY.startsWith('PEGA_AQUI')
