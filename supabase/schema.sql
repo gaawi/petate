@@ -96,18 +96,22 @@ where not exists (select 1 from locations);
 
 -- Armarios y maletas iniciales (asociados a las ubicaciones recién creadas)
 insert into wardrobes (name, location_id)
-select 'Armario Principal', id from locations where name = 'Casa Nueva York'
+select v.name, l.id
+from (values
+  ('Armario Principal', 'Casa Nueva York'),
+  ('Armario Habitación', 'Casa España')
+) as v(name, loc)
+join locations l on l.name = v.loc
 where not exists (select 1 from wardrobes);
-insert into wardrobes (name, location_id)
-select 'Armario Habitación', id from locations where name = 'Casa España'
-on conflict do nothing;
 
 insert into suitcases (name, current_location_id)
-select 'Maleta Grande', id from locations where name = 'Casa Nueva York'
+select v.name, l.id
+from (values
+  ('Maleta Grande', 'Casa Nueva York'),
+  ('Maleta de Mano', 'Casa España')
+) as v(name, loc)
+join locations l on l.name = v.loc
 where not exists (select 1 from suitcases);
-insert into suitcases (name, current_location_id)
-select 'Maleta de Mano', id from locations where name = 'Casa España'
-on conflict do nothing;
 
 -- ---- SEGURIDAD (Row Level Security) ----------------------------------------
 -- Activamos RLS y permitimos el acceso SOLO a usuarios que han iniciado sesión.
@@ -141,14 +145,23 @@ insert into storage.buckets (id, name, public)
 values ('photos', 'photos', true)
 on conflict (id) do update set public = true;
 
-drop policy if exists "fotos lectura publica" on storage.objects;
-create policy "fotos lectura publica" on storage.objects
-  for select to public using (bucket_id = 'photos');
+-- Las políticas de almacenamiento van en un bloque protegido: si tu proyecto
+-- no permite crearlas por SQL, el resto del script (tablas, datos) NO se anula.
+-- En ese caso, créalas a mano en Storage → photos → Policies (o deja el bucket
+-- público, que es suficiente para esta app).
+do $$
+begin
+  drop policy if exists "fotos lectura publica" on storage.objects;
+  create policy "fotos lectura publica" on storage.objects
+    for select to public using (bucket_id = 'photos');
 
-drop policy if exists "fotos subir autenticado" on storage.objects;
-create policy "fotos subir autenticado" on storage.objects
-  for insert to authenticated with check (bucket_id = 'photos');
+  drop policy if exists "fotos subir autenticado" on storage.objects;
+  create policy "fotos subir autenticado" on storage.objects
+    for insert to authenticated with check (bucket_id = 'photos');
 
-drop policy if exists "fotos borrar autenticado" on storage.objects;
-create policy "fotos borrar autenticado" on storage.objects
-  for delete to authenticated using (bucket_id = 'photos');
+  drop policy if exists "fotos borrar autenticado" on storage.objects;
+  create policy "fotos borrar autenticado" on storage.objects
+    for delete to authenticated using (bucket_id = 'photos');
+exception when others then
+  raise notice 'No se pudieron crear las políticas de Storage por SQL (%). Créalas desde el panel si hace falta.', sqlerrm;
+end $$;
