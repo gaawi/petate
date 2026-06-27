@@ -20,9 +20,9 @@ export default function Garments() {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Garment | null>(null)
   const [search, setSearch] = useState(searchParams.get('search') || '')
-  const [view, setView] = useState<ViewMode>(() => (localStorage.getItem('petate-view') as ViewMode) || 'comoda')
+  const [view, setView] = useState<ViewMode>(() => (localStorage.getItem('petate-view-2') as ViewMode) || 'lista')
 
-  const chooseView = (v: ViewMode) => { setView(v); localStorage.setItem('petate-view', v) }
+  const chooseView = (v: ViewMode) => { setView(v); localStorage.setItem('petate-view-2', v) }
 
   const filters = {
     owner_id: searchParams.get('owner_id') || '',

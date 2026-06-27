@@ -16,8 +16,8 @@ interface Props {
 // Cuadrícula de prendas con selector de vista (cómoda / densa / lista).
 // La preferencia se comparte con el resto de la app vía localStorage.
 export default function GarmentGrid({ garments, onEdit, onDelete, onDuplicate, empty }: Props) {
-  const [view, setView] = useState<ViewMode>(() => (localStorage.getItem('petate-view') as ViewMode) || 'comoda')
-  const chooseView = (v: ViewMode) => { setView(v); localStorage.setItem('petate-view', v) }
+  const [view, setView] = useState<ViewMode>(() => (localStorage.getItem('petate-view-2') as ViewMode) || 'lista')
+  const chooseView = (v: ViewMode) => { setView(v); localStorage.setItem('petate-view-2', v) }
 
   return (
     <div>

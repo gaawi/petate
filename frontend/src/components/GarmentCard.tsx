@@ -2,6 +2,7 @@ import { SquarePen, Trash2, Star, MapPin, Copy } from 'lucide-react'
 import type { Garment } from '../types'
 import { getCategoryInfo, getConditionInfo, getSeasonInfo, getUseTypeInfo, getFitInfo } from '../types'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
+import SwipeableRow from './SwipeableRow'
 
 interface Props {
   garment: Garment
@@ -47,39 +48,57 @@ export default function GarmentCard({ garment, onEdit, onDelete, onDuplicate, la
     ? `${garment.suitcase_name}${garment.suitcase_location_city ? ` · ${garment.suitcase_location_city}` : ''}`
     : null
 
-  // ---------- Vista LISTA ----------
+  // ---------- Vista LISTA (con swipe iOS) ----------
   if (layout === 'list') {
     return (
-      <div className="ios-card flex items-center gap-3 p-2.5 group">
-        <div className="relative w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
-          {garment.photo_path
-            ? <img src={garment.photo_path} alt={garment.name} className="w-full h-full object-cover" />
-            : <div className="w-full h-full flex items-center justify-center"><CategoryIcon value={garment.category} className="w-7 h-7 text-gray-300" /></div>}
-          <QtyBadge n={garment.quantity} className="absolute -top-1 -right-1 scale-90" />
-        </div>
+      <SwipeableRow
+        actions={[
+          { key: 'edit', label: 'Editar', bg: 'bg-brand-600', icon: <SquarePen className="w-5 h-5" />, onClick: () => onEdit(garment) },
+          { key: 'del', label: 'Borrar', bg: 'bg-red-500', icon: <Trash2 className="w-5 h-5" />, onClick: () => onDelete(garment) },
+        ]}
+      >
+        <div className="flex items-center gap-3 p-2.5">
+          <div className="relative w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+            {garment.photo_path
+              ? <img src={garment.photo_path} alt={garment.name} className="w-full h-full object-cover" />
+              : <div className="w-full h-full flex items-center justify-center"><CategoryIcon value={garment.category} className="w-8 h-8 text-gray-300" /></div>}
+            <QtyBadge n={garment.quantity} className="absolute -top-1 -right-1 scale-90" />
+          </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
-            {garment.owner_color && <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: garment.owner_color }} />}
-            <span className="font-semibold text-[15px] text-gray-900 truncate">{garment.name}</span>
-          </div>
-          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
-            <CategoryIcon value={garment.category} className="w-3.5 h-3.5" />
-            <span className="truncate">{cat.label}{garment.brand ? ` · ${garment.brand}` : ''}</span>
-          </div>
-          {locationStr && (
-            <div className="text-xs text-gray-400 flex items-center gap-1 truncate mt-0.5">
-              <MapPin className="w-3 h-3 flex-shrink-0" /> <span className="truncate">{locationStr}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              {garment.owner_color && <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: garment.owner_color }} />}
+              <span className="font-semibold text-[15px] text-gray-900 truncate">{garment.name}</span>
             </div>
-          )}
-        </div>
+            {garment.brand && <div className="text-xs text-gray-400 truncate">{garment.brand}</div>}
 
-        <div className="flex items-center gap-0.5 flex-shrink-0">
-          <button onClick={() => onEdit(garment)} className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-black/5" aria-label="Editar"><SquarePen className="w-[18px] h-[18px]" /></button>
-          {onDuplicate && <button onClick={() => onDuplicate(garment)} className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-black/5" aria-label="Duplicar"><Copy className="w-[18px] h-[18px]" /></button>}
-          <button onClick={() => onDelete(garment)} className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-red-50 hover:text-red-600" aria-label="Eliminar"><Trash2 className="w-[18px] h-[18px]" /></button>
+            {/* Etiquetas (ahora hay sitio gracias al swipe) */}
+            <div className="mt-1 flex flex-wrap gap-1">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-black/[0.05] rounded-full text-[11px] text-gray-600">
+                <CategoryIcon value={garment.category} className="w-3 h-3" /> {cat.label}
+              </span>
+              <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${cond.color}`}>{cond.label}</span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-sky-50 text-sky-700 rounded-full text-[11px]">
+                <SeasonIcon value={garment.season} className="w-3 h-3" /> {season.label}
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full text-[11px]">
+                <UseTypeIcon value={garment.use_type} className="w-3 h-3" /> {useType.label}
+              </span>
+              {garment.fit !== 'bien' && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full text-[11px]">
+                  <FitIcon value={garment.fit} className="w-3 h-3" /> {fit.label}
+                </span>
+              )}
+            </div>
+
+            {locationStr && (
+              <div className="text-xs text-gray-400 flex items-center gap-1 truncate mt-1">
+                <MapPin className="w-3 h-3 flex-shrink-0" /> <span className="truncate">{locationStr}</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </SwipeableRow>
     )
   }
 
