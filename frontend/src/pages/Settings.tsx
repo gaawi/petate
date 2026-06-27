@@ -4,13 +4,14 @@ import type { FamilyMember, Location } from '../types'
 import Modal from '../components/Modal'
 import { useAuth } from '../lib/auth'
 import { Users, MapPin, Lock, House, SquarePen, Trash2, Plus, LogOut } from 'lucide-react'
+import { RoleIcon } from '../components/icons'
 
 const COLORS = ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16']
 const ROLES = [
-  { value: 'padre', label: '👨 Padre' },
-  { value: 'madre', label: '👩 Madre' },
-  { value: 'hijo', label: '🧒 Hijo/a' },
-  { value: 'otro', label: '👤 Otro' },
+  { value: 'padre', label: 'Padre' },
+  { value: 'madre', label: 'Madre' },
+  { value: 'hijo', label: 'Hijo/a' },
+  { value: 'otro', label: 'Otro' },
 ]
 
 export default function Settings() {
@@ -208,11 +209,11 @@ export default function Settings() {
                     key={r.value}
                     type="button"
                     onClick={() => setMForm(f => ({ ...f, role: r.value }))}
-                    className={`px-3 py-1.5 rounded-xl border text-sm transition-all ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-sm transition-all ${
                       mForm.role === r.value ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium' : 'border-gray-200 text-gray-600'
                     }`}
                   >
-                    {r.label}
+                    <RoleIcon value={r.value} className="w-4 h-4" /> {r.label}
                   </button>
                 ))}
               </div>

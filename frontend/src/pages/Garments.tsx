@@ -6,7 +6,7 @@ import { CATEGORIES, USE_TYPES, CONDITIONS, SEASONS, FIT_OPTIONS } from '../type
 import GarmentCard from '../components/GarmentCard'
 import GarmentForm from '../components/GarmentForm'
 import Modal from '../components/Modal'
-import { Plus, Search, ChevronDown } from 'lucide-react'
+import { Plus, Search, ChevronDown, Shirt } from 'lucide-react'
 
 export default function Garments() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -132,11 +132,11 @@ export default function Garments() {
 
         {/* More filters row */}
         <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          <FilterChip label="Temporada" value={filters.season} options={SEASONS.map(s => ({ value: s.value, label: `${s.emoji} ${s.label}` }))} onChange={v => setFilter('season', v)} />
-          <FilterChip label="Uso" value={filters.use_type} options={USE_TYPES.map(u => ({ value: u.value, label: `${u.emoji} ${u.label}` }))} onChange={v => setFilter('use_type', v)} />
+          <FilterChip label="Temporada" value={filters.season} options={SEASONS.map(s => ({ value: s.value, label: s.label }))} onChange={v => setFilter('season', v)} />
+          <FilterChip label="Uso" value={filters.use_type} options={USE_TYPES.map(u => ({ value: u.value, label: u.label }))} onChange={v => setFilter('use_type', v)} />
           <FilterChip label="Estado" value={filters.condition} options={CONDITIONS.map(c => ({ value: c.value, label: c.label }))} onChange={v => setFilter('condition', v)} />
-          <FilterChip label="Talla" value={filters.fit} options={FIT_OPTIONS.map(f => ({ value: f.value, label: `${f.emoji} ${f.label}` }))} onChange={v => setFilter('fit', v)} />
-          <FilterChip label="Tipo" value={filters.category} options={CATEGORIES.map(c => ({ value: c.value, label: `${c.emoji} ${c.label}` }))} onChange={v => setFilter('category', v)} />
+          <FilterChip label="Talla" value={filters.fit} options={FIT_OPTIONS.map(f => ({ value: f.value, label: f.label }))} onChange={v => setFilter('fit', v)} />
+          <FilterChip label="Tipo" value={filters.category} options={CATEGORIES.map(c => ({ value: c.value, label: c.label }))} onChange={v => setFilter('category', v)} />
           {activeFilterCount > 0 && (
             <button
               onClick={clearFilters}
@@ -153,7 +153,7 @@ export default function Garments() {
         <div className="flex justify-center py-12 text-gray-400">Cargando...</div>
       ) : garments.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <div className="text-5xl mb-3">👕</div>
+          <Shirt className="w-12 h-12 mx-auto mb-3 text-gray-300" strokeWidth={1.5} />
           <div className="font-medium">No hay prendas{activeFilterCount > 0 ? ' con esos filtros' : ''}</div>
           {activeFilterCount > 0 && (
             <button onClick={clearFilters} className="mt-2 text-brand-600 text-sm hover:underline">

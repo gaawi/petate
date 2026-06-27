@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Heart, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
 import { api } from '../api'
 import { getCategoryInfo } from '../types'
+import { CategoryIcon, SeasonIcon, UseTypeIcon } from '../components/icons'
 
 export default function Dashboard() {
   const [stats, setStats] = useState<{
@@ -25,19 +27,19 @@ export default function Dashboard() {
   }
 
   const seasonLabels: Record<string, string> = {
-    todo: '🗓️ Todo el año', verano: '☀️ Verano', invierno: '❄️ Invierno',
-    primavera: '🌸 Primavera', otono: '🍂 Otoño',
+    todo: 'Todo el año', verano: 'Verano', invierno: 'Invierno',
+    primavera: 'Primavera', otono: 'Otoño',
   }
   const useTypeLabels: Record<string, string> = {
-    salir: '🎉 Salir', casa: '🏠 Casa', trabajo: '💼 Trabajo',
-    deporte: '🏃 Deporte', ensuciar: '🎨 Ensuciar', playa: '🏖️ Playa',
-    pijama: '😴 Pijama', donar: '💝 Donar', tirar: '🗑️ Tirar',
+    salir: 'Salir', casa: 'Casa', trabajo: 'Trabajo',
+    deporte: 'Deporte', ensuciar: 'Ensuciar', playa: 'Playa',
+    pijama: 'Pijama', donar: 'Donar', tirar: 'Tirar',
   }
 
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="ios-large-title text-gray-900">¡Hola! 👋</h1>
+        <h1 className="ios-large-title text-gray-900">¡Hola!</h1>
         <p className="text-gray-500 mt-1">Tienes <strong>{stats.total}</strong> prendas en tu inventario</p>
       </div>
 
@@ -75,7 +77,7 @@ export default function Dashboard() {
               const pct = stats.total > 0 ? Math.round((item.count / stats.total) * 100) : 0
               return (
                 <Link key={item.category} to={`/ropa?category=${item.category}`} className="flex items-center gap-3 group">
-                  <span className="text-lg w-6 text-center">{cat.emoji}</span>
+                  <CategoryIcon value={item.category} className="w-5 h-5 text-gray-500 flex-shrink-0" />
                   <div className="flex-1">
                     <div className="flex justify-between text-xs text-gray-600 mb-0.5">
                       <span className="group-hover:text-brand-600 transition-colors">{cat.label}</span>
@@ -102,6 +104,7 @@ export default function Dashboard() {
                   to={`/ropa?use_type=${item.use_type}`}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.05] hover:bg-brand-50 rounded-xl text-sm text-gray-700 transition-colors"
                 >
+                  <UseTypeIcon value={item.use_type} className="w-4 h-4 text-gray-500" />
                   {useTypeLabels[item.use_type] || item.use_type}
                   <span className="font-bold text-gray-900">{item.count}</span>
                 </Link>
@@ -119,6 +122,7 @@ export default function Dashboard() {
                   to={`/ropa?season=${item.season}`}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.05] hover:bg-brand-50 rounded-xl text-sm text-gray-700 transition-colors"
                 >
+                  <SeasonIcon value={item.season} className="w-4 h-4 text-gray-500" />
                   {seasonLabels[item.season] || item.season}
                   <span className="font-bold text-gray-900">{item.count}</span>
                 </Link>
@@ -131,17 +135,17 @@ export default function Dashboard() {
             <h2 className="text-base font-semibold text-gray-700 mb-3">Accesos rápidos</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { to: '/ropa?use_type=donar', label: '💝 Para donar' },
-                { to: '/ropa?use_type=tirar', label: '🗑️ Para tirar' },
-                { to: '/ropa?fit=grande', label: '⬆️ Queda grande' },
-                { to: '/ropa?fit=pequena', label: '⬇️ Queda pequeña' },
+                { to: '/ropa?use_type=donar', label: 'Para donar', Icon: Heart },
+                { to: '/ropa?use_type=tirar', label: 'Para tirar', Icon: Trash2 },
+                { to: '/ropa?fit=grande', label: 'Queda grande', Icon: ArrowUp },
+                { to: '/ropa?fit=pequena', label: 'Queda pequeña', Icon: ArrowDown },
               ].map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="px-3 py-2 bg-black/[0.05] hover:bg-brand-50 rounded-xl text-xs text-gray-700 transition-colors text-center"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 bg-black/[0.05] hover:bg-brand-50 rounded-xl text-xs text-gray-700 transition-colors"
                 >
-                  {link.label}
+                  <link.Icon className="w-4 h-4 text-gray-500" /> {link.label}
                 </Link>
               ))}
             </div>

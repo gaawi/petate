@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { ImagePlus, X, Star } from 'lucide-react'
+import type { ComponentType } from 'react'
+import { ImagePlus, X, Star, DoorOpen, Luggage, Ban } from 'lucide-react'
 import type { Garment, FamilyMember, Wardrobe, Suitcase } from '../types'
 import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS } from '../types'
 import { api } from '../api'
+import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
 
 interface Props {
   garment?: Garment
@@ -22,12 +24,13 @@ const defaultForm = {
 }
 
 function OptionGroup<T extends string>({
-  options, value, onChange, small,
+  options, value, onChange, small, Icon,
 }: {
   options: readonly { value: T; label: string; emoji?: string }[]
   value: T
   onChange: (v: T) => void
   small?: boolean
+  Icon?: ComponentType<{ value: string; className?: string }>
 }) {
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -36,13 +39,13 @@ function OptionGroup<T extends string>({
           key={o.value}
           type="button"
           onClick={() => onChange(o.value)}
-          className={`px-2.5 py-1 rounded-lg border text-sm transition-all ${
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-sm transition-all ${
             value === o.value
               ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
               : 'border-gray-200 text-gray-600 hover:border-gray-300'
           } ${small ? 'text-xs px-2 py-0.5' : ''}`}
         >
-          {o.emoji && <span className="mr-1">{o.emoji}</span>}
+          {Icon && <Icon value={o.value} className="w-4 h-4" />}
           {o.label}
         </button>
       ))}
@@ -211,13 +214,13 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
               key={c.value}
               type="button"
               onClick={() => set('category', c.value)}
-              className={`px-2 py-1 rounded-lg border text-xs transition-all ${
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs transition-all ${
                 form.category === c.value
                   ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
                   : 'border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
-              {c.emoji} {c.label}
+              <CategoryIcon value={c.value} className="w-4 h-4" /> {c.label}
             </button>
           ))}
         </div>
@@ -257,21 +260,21 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Ubicación</label>
         <div className="flex gap-2 mb-2">
           {[
-            { value: 'wardrobe', label: '🚪 Armario' },
-            { value: 'suitcase', label: '🧳 Maleta' },
-            { value: 'none', label: 'Sin ubicar' },
+            { value: 'wardrobe', label: 'Armario', Icon: DoorOpen },
+            { value: 'suitcase', label: 'Maleta', Icon: Luggage },
+            { value: 'none', label: 'Sin ubicar', Icon: Ban },
           ].map(opt => (
             <button
               key={opt.value}
               type="button"
               onClick={() => set('storage_type', opt.value)}
-              className={`px-3 py-1.5 rounded-xl border text-sm transition-all ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-sm transition-all ${
                 form.storage_type === opt.value
                   ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
                   : 'border-gray-200 text-gray-600'
               }`}
             >
-              {opt.label}
+              <opt.Icon className="w-4 h-4" /> {opt.label}
             </button>
           ))}
         </div>
@@ -308,13 +311,13 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
       {/* Season */}
       <div>
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Temporada</label>
-        <OptionGroup options={SEASONS} value={form.season} onChange={v => set('season', v)} />
+        <OptionGroup options={SEASONS} value={form.season} onChange={v => set('season', v)} Icon={SeasonIcon} />
       </div>
 
       {/* Use type */}
       <div>
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Para qué sirve</label>
-        <OptionGroup options={USE_TYPES} value={form.use_type} onChange={v => set('use_type', v)} />
+        <OptionGroup options={USE_TYPES} value={form.use_type} onChange={v => set('use_type', v)} Icon={UseTypeIcon} />
       </div>
 
       {/* Condition */}
@@ -326,7 +329,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
       {/* Fit */}
       <div>
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Talla / Cómo me queda</label>
-        <OptionGroup options={FIT_OPTIONS} value={form.fit} onChange={v => set('fit', v)} />
+        <OptionGroup options={FIT_OPTIONS} value={form.fit} onChange={v => set('fit', v)} Icon={FitIcon} />
       </div>
 
       {/* Rating */}

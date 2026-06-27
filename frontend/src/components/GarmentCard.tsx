@@ -1,6 +1,7 @@
 import { SquarePen, Trash2, Star, MapPin } from 'lucide-react'
 import type { Garment } from '../types'
 import { getCategoryInfo, getConditionInfo, getSeasonInfo, getUseTypeInfo, getFitInfo } from '../types'
+import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
 
 interface Props {
   garment: Garment
@@ -43,7 +44,7 @@ export default function GarmentCard({ garment, onEdit, onDelete }: Props) {
           <img src={garment.photo_path} alt={garment.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-6xl opacity-25">{cat.emoji}</span>
+            <CategoryIcon value={garment.category} className="w-16 h-16 text-gray-300" />
           </div>
         )}
 
@@ -87,21 +88,21 @@ export default function GarmentCard({ garment, onEdit, onDelete }: Props) {
         {garment.brand && <div className="text-xs text-gray-400 truncate">{garment.brand}</div>}
 
         <div className="mt-2 flex flex-wrap gap-1">
-          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-black/[0.05] rounded-full text-[11px] text-gray-600">
-            {cat.emoji} {cat.label}
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-black/[0.05] rounded-full text-[11px] text-gray-600">
+            <CategoryIcon value={garment.category} className="w-3 h-3" /> {cat.label}
           </span>
           <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${cond.color}`}>
             {cond.label}
           </span>
-          <span className="px-2 py-0.5 bg-sky-50 text-sky-700 rounded-full text-[11px]">
-            {season.emoji} {season.label}
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-sky-50 text-sky-700 rounded-full text-[11px]">
+            <SeasonIcon value={garment.season} className="w-3 h-3" /> {season.label}
           </span>
-          <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full text-[11px]">
-            {useType.emoji} {useType.label}
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full text-[11px]">
+            <UseTypeIcon value={garment.use_type} className="w-3 h-3" /> {useType.label}
           </span>
           {garment.fit !== 'bien' && (
-            <span className="px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full text-[11px]">
-              {fit.emoji} {fit.label}
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full text-[11px]">
+              <FitIcon value={garment.fit} className="w-3 h-3" /> {fit.label}
             </span>
           )}
         </div>
