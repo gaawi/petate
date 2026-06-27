@@ -63,6 +63,7 @@ export interface Garment {
   fit: string
   season: string
   rating: number
+  quantity: number
   brand: string | null
   color: string | null
   notes: string | null

@@ -71,6 +71,12 @@ export default function Wardrobes() {
     setWardrobes(ws => ws.map(w => w.id === g.wardrobe_id ? { ...w, garment_count: Math.max(0, (w.garment_count || 0) - 1) } : w))
   }
 
+  const handleDuplicateGarment = async (g: Garment) => {
+    const copy = await api.garments.duplicate(g)
+    setGarments(prev => [copy, ...prev])
+    setWardrobes(ws => ws.map(w => w.id === copy.wardrobe_id ? { ...w, garment_count: (w.garment_count || 0) + 1 } : w))
+  }
+
   // Group by location
   const byLocation: Record<string, Wardrobe[]> = {}
   wardrobes.forEach(w => {
@@ -180,6 +186,7 @@ export default function Wardrobes() {
                       garment={g}
                       onEdit={g => { setEditingGarment(g); setShowAddGarment(true) }}
                       onDelete={handleDeleteGarment}
+                      onDuplicate={handleDuplicateGarment}
                     />
                   ))}
                 </div>

@@ -90,6 +90,12 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
     setSuitcases(ss => ss.map(s => s.id === g.suitcase_id ? { ...s, garment_count: Math.max(0, (s.garment_count || 0) - 1) } : s))
   }
 
+  const handleDuplicateGarment = async (g: Garment) => {
+    const copy = await api.garments.duplicate(g)
+    setGarments(prev => [copy, ...prev])
+    setSuitcases(ss => ss.map(s => s.id === copy.suitcase_id ? { ...s, garment_count: (s.garment_count || 0) + 1 } : s))
+  }
+
   return (
     <div className={embedded ? '' : 'p-4 md:p-6'}>
       <div className="flex items-center justify-between mb-6">
@@ -196,6 +202,7 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
                       garment={g}
                       onEdit={g => { setEditingGarment(g); setShowAddGarment(true) }}
                       onDelete={handleDeleteGarment}
+                      onDuplicate={handleDuplicateGarment}
                     />
                   ))}
                 </div>

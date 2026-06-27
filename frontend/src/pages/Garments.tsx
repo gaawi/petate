@@ -6,7 +6,9 @@ import { CATEGORIES, USE_TYPES, CONDITIONS, SEASONS, FIT_OPTIONS } from '../type
 import GarmentCard from '../components/GarmentCard'
 import GarmentForm from '../components/GarmentForm'
 import Modal from '../components/Modal'
-import { Plus, Search, ChevronDown, Shirt } from 'lucide-react'
+import { Plus, Search, ChevronDown, Shirt, LayoutGrid, Grid3x3, List } from 'lucide-react'
+
+type ViewMode = 'comoda' | 'densa' | 'lista'
 
 export default function Garments() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -18,6 +20,9 @@ export default function Garments() {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Garment | null>(null)
   const [search, setSearch] = useState(searchParams.get('search') || '')
+  const [view, setView] = useState<ViewMode>(() => (localStorage.getItem('petate-view') as ViewMode) || 'comoda')
+
+  const chooseView = (v: ViewMode) => { setView(v); localStorage.setItem('petate-view', v) }
 
   const filters = {
     owner_id: searchParams.get('owner_id') || '',
@@ -75,6 +80,11 @@ export default function Garments() {
     if (!confirm(`¿Eliminar "${g.name}"?`)) return
     await api.garments.delete(g.id)
     setGarments(prev => prev.filter(x => x.id !== g.id))
+  }
+
+  const handleDuplicate = async (g: Garment) => {
+    const copy = await api.garments.duplicate(g)
+    setGarments(prev => [copy, ...prev])
   }
 
   return (
@@ -148,6 +158,28 @@ export default function Garments() {
         </div>
       </div>
 
+      {/* Selector de vista */}
+      <div className="flex items-center justify-end mb-3">
+        <div className="inline-flex p-0.5 bg-black/[0.06] rounded-lg">
+          {([
+            { v: 'comoda', Icon: LayoutGrid, label: 'Cómoda' },
+            { v: 'densa', Icon: Grid3x3, label: 'Densa' },
+            { v: 'lista', Icon: List, label: 'Lista' },
+          ] as const).map(({ v, Icon, label }) => (
+            <button
+              key={v}
+              onClick={() => chooseView(v)}
+              aria-label={label}
+              className={`w-8 h-7 flex items-center justify-center rounded-md transition-all ${
+                view === v ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400'
+              }`}
+            >
+              <Icon className="w-[18px] h-[18px]" />
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Grid */}
       {loading ? (
         <div className="flex justify-center py-12 text-gray-400">Cargando...</div>
@@ -161,14 +193,32 @@ export default function Garments() {
             </button>
           )}
         </div>
+      ) : view === 'lista' ? (
+        <div className="space-y-2">
+          {garments.map(g => (
+            <GarmentCard
+              key={g.id}
+              garment={g}
+              layout="list"
+              onEdit={g => { setEditing(g); setShowForm(true) }}
+              onDelete={handleDelete}
+              onDuplicate={handleDuplicate}
+            />
+          ))}
+        </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        <div className={`grid gap-3 ${
+          view === 'densa'
+            ? 'grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10'
+            : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+        }`}>
           {garments.map(g => (
             <GarmentCard
               key={g.id}
               garment={g}
               onEdit={g => { setEditing(g); setShowForm(true) }}
               onDelete={handleDelete}
+              onDuplicate={handleDuplicate}
             />
           ))}
         </div>

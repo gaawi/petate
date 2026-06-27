@@ -303,7 +303,8 @@ export const api = {
           wardrobe_id: d.wardrobe_id ?? null, suitcase_id: d.suitcase_id ?? null,
           photo_path: d.photo_path ?? null, condition: d.condition || 'buena',
           use_type: d.use_type || 'salir', fit: d.fit || 'bien', season: d.season || 'todo',
-          rating: d.rating ?? 3, brand: d.brand ?? null, color: d.color ?? null, notes: d.notes ?? null,
+          rating: d.rating ?? 3, quantity: d.quantity ?? 1,
+          brand: d.brand ?? null, color: d.color ?? null, notes: d.notes ?? null,
         })
         .select(GARMENT_SELECT).single()
       return flatGarment(check(data, error))
@@ -315,10 +316,24 @@ export const api = {
           name: d.name, category: d.category, owner_id: d.owner_id ?? null,
           wardrobe_id: d.wardrobe_id ?? null, suitcase_id: d.suitcase_id ?? null,
           photo_path: d.photo_path ?? null, condition: d.condition, use_type: d.use_type,
-          fit: d.fit, season: d.season, rating: d.rating, brand: d.brand ?? null,
-          color: d.color ?? null, notes: d.notes ?? null,
+          fit: d.fit, season: d.season, rating: d.rating, quantity: d.quantity ?? 1,
+          brand: d.brand ?? null, color: d.color ?? null, notes: d.notes ?? null,
         })
         .eq('id', id).select(GARMENT_SELECT).single()
+      return flatGarment(check(data, error))
+    },
+    // Crea una copia idéntica de una prenda existente.
+    duplicate: async (g: Garment): Promise<Garment> => {
+      const { data, error } = await supabase
+        .from('garments')
+        .insert({
+          name: g.name, category: g.category, owner_id: g.owner_id ?? null,
+          wardrobe_id: g.wardrobe_id ?? null, suitcase_id: g.suitcase_id ?? null,
+          photo_path: g.photo_path ?? null, condition: g.condition, use_type: g.use_type,
+          fit: g.fit, season: g.season, rating: g.rating, quantity: g.quantity ?? 1,
+          brand: g.brand ?? null, color: g.color ?? null, notes: g.notes ?? null,
+        })
+        .select(GARMENT_SELECT).single()
       return flatGarment(check(data, error))
     },
     delete: async (id: number) => {

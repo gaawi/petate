@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ComponentType } from 'react'
-import { ImagePlus, X, Star, DoorOpen, Luggage, Ban } from 'lucide-react'
+import { ImagePlus, X, Star, DoorOpen, Luggage, Ban, Minus, Plus } from 'lucide-react'
 import type { Garment, FamilyMember, Wardrobe, Suitcase } from '../types'
 import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS } from '../types'
 import { api } from '../api'
@@ -20,7 +20,7 @@ const defaultForm = {
   storage_type: 'wardrobe' as 'wardrobe' | 'suitcase' | 'none',
   wardrobe_id: '' as number | '', suitcase_id: '' as number | '',
   photo_path: '', condition: 'buena', use_type: 'salir',
-  fit: 'bien', season: 'todo', rating: 3, brand: '', color: '', notes: '',
+  fit: 'bien', season: 'todo', rating: 3, quantity: 1, brand: '', color: '', notes: '',
 }
 
 function OptionGroup<T extends string>({
@@ -69,6 +69,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
       fit: garment.fit,
       season: garment.season,
       rating: garment.rating,
+      quantity: garment.quantity ?? 1,
       brand: garment.brand ?? '',
       color: garment.color ?? '',
       notes: garment.notes ?? '',
@@ -112,6 +113,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         fit: form.fit,
         season: form.season,
         rating: form.rating,
+        quantity: form.quantity,
         brand: form.brand.trim() || null,
         color: form.color.trim() || null,
         notes: form.notes.trim() || null,
@@ -349,6 +351,29 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
           <span className="text-sm text-gray-400 ml-2">
             {['', 'No me gusta', 'Regular', 'Bien', 'Me gusta', 'Me encanta'][form.rating]}
           </span>
+        </div>
+      </div>
+
+      {/* Cantidad */}
+      <div>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Cantidad (prendas iguales)</label>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => set('quantity', Math.max(1, form.quantity - 1))}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/[0.06] text-gray-700 disabled:opacity-40"
+            disabled={form.quantity <= 1}
+          >
+            <Minus className="w-4 h-4" strokeWidth={2.5} />
+          </button>
+          <span className="w-10 text-center text-lg font-semibold text-gray-900">{form.quantity}</span>
+          <button
+            type="button"
+            onClick={() => set('quantity', form.quantity + 1)}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/[0.06] text-gray-700"
+          >
+            <Plus className="w-4 h-4" strokeWidth={2.5} />
+          </button>
         </div>
       </div>
 
