@@ -98,13 +98,13 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
 
   return (
     <div className={embedded ? '' : 'p-4 md:p-6'}>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-3 mb-6">
         {embedded
-          ? <p className="text-sm text-gray-400">Tus maletas y lo que llevan dentro</p>
+          ? <p className="text-sm text-gray-400 min-w-0">Tus maletas y lo que llevan dentro</p>
           : <h1 className="ios-large-title">Maletas</h1>}
         <button
           onClick={() => { setForm({ name: '', current_location_id: '' }); setEditSuitcase(null); setShowAdd(true) }}
-          className="ios-btn-primary"
+          className="ios-btn-primary whitespace-nowrap shrink-0"
         >
           <Plus className="w-4 h-4" />
           Nueva maleta
@@ -156,36 +156,39 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
         <div className="md:col-span-2">
           {selected ? (
             <>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="flex items-center gap-1.5 font-semibold text-gray-900"><Luggage className="w-5 h-5 text-gray-400" /> {selected.name}</h2>
-                  <p className="flex items-center gap-1 text-sm text-gray-400">
-                    {selected.location_name ? (
-                      <><MapPin className="w-3.5 h-3.5" /> {selected.location_name}</>
-                    ) : 'Sin ubicar'}
-                  </p>
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-3 min-w-0">
+                  <Luggage className="w-5 h-5 text-gray-400 shrink-0" />
+                  <div className="min-w-0">
+                    <h2 className="font-semibold text-gray-900 truncate">{selected.name}</h2>
+                    <p className="flex items-center gap-1 text-sm text-gray-400 truncate">
+                      {selected.location_name ? (
+                        <><MapPin className="w-3.5 h-3.5 shrink-0" /> {selected.location_name}</>
+                      ) : 'Sin ubicar'}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2 justify-end">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => { setMoveTarget(String(selected.current_location_id || '')); setShowMove(true) }}
-                    className="flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-xl px-3 py-1.5 font-medium"
+                    className="flex items-center justify-center gap-1.5 bg-amber-50 text-amber-700 rounded-xl px-2 py-2 text-[13px] font-medium"
                   >
-                    <PlaneTakeoff className="w-4 h-4" />
+                    <PlaneTakeoff className="w-4 h-4 shrink-0" />
                     Mover
                   </button>
                   <button
                     onClick={() => setShowPicker(true)}
-                    className="flex items-center gap-1.5 bg-black/[0.06] text-brand-600 rounded-xl px-3 py-1.5 font-medium"
+                    className="flex items-center justify-center gap-1.5 bg-black/[0.06] text-brand-600 rounded-xl px-2 py-2 text-[13px] font-medium"
                   >
-                    <PackagePlus className="w-4 h-4" />
-                    Añadir ropa
+                    <PackagePlus className="w-4 h-4 shrink-0" />
+                    Añadir
                   </button>
                   <button
                     onClick={() => setShowAddGarment(true)}
-                    className="ios-btn-primary"
+                    className="flex items-center justify-center gap-1.5 bg-brand-600 text-white rounded-xl px-2 py-2 text-[13px] font-medium"
                   >
-                    <Plus className="w-4 h-4" />
-                    Nueva prenda
+                    <Plus className="w-4 h-4 shrink-0" />
+                    Nueva
                   </button>
                 </div>
               </div>

@@ -21,6 +21,7 @@ export default function GarmentGrid({ garments, onEdit, onDelete, onDuplicate, e
 
   return (
     <div>
+      {garments.length > 0 && (
       <div className="flex items-center justify-end mb-3">
         <div className="inline-flex p-0.5 bg-black/[0.06] rounded-lg">
           {([
@@ -41,6 +42,7 @@ export default function GarmentGrid({ garments, onEdit, onDelete, onDuplicate, e
           ))}
         </div>
       </div>
+      )}
 
       {garments.length === 0 ? (
         empty ?? null

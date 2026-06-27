@@ -154,23 +154,24 @@ export default function Wardrobes() {
         <div className="md:col-span-2">
           {selected ? (
             <>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="font-semibold text-gray-900 flex items-center gap-1.5">
-                    <DoorOpen className="w-5 h-5 text-gray-400" /> {selected.name}
-                  </h2>
-                  {selected.location_name && (
-                    <p className="text-sm text-gray-400 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5" /> {selected.location_name}
-                    </p>
-                  )}
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <DoorOpen className="w-5 h-5 text-gray-400 shrink-0" />
+                  <div className="min-w-0">
+                    <h2 className="font-semibold text-gray-900 truncate">{selected.name}</h2>
+                    {selected.location_name && (
+                      <p className="text-sm text-gray-400 flex items-center gap-1 truncate">
+                        <MapPin className="w-3.5 h-3.5 shrink-0" /> {selected.location_name}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowAddGarment(true)}
-                  className="bg-brand-50 text-brand-700 rounded-xl px-3 py-1.5 font-medium flex items-center gap-1"
+                  className="bg-brand-600 text-white rounded-xl px-3 py-2 font-medium flex items-center gap-1.5 whitespace-nowrap shrink-0 text-[13px]"
                 >
                   <Plus className="w-4 h-4" />
-                  Añadir prenda aquí
+                  Añadir
                 </button>
               </div>
               <GarmentGrid

@@ -74,13 +74,13 @@ export default function Trips({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <div className={embedded ? 'max-w-3xl' : 'p-4 md:p-6 max-w-3xl'}>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-3 mb-6">
         {embedded
-          ? <p className="text-sm text-gray-400">Planifica y haz las maletas para cada viaje</p>
+          ? <p className="text-sm text-gray-400 min-w-0">Planifica y haz las maletas para cada viaje</p>
           : <h1 className="ios-large-title">Viajes</h1>}
         <button
           onClick={openAdd}
-          className="ios-btn-primary"
+          className="ios-btn-primary whitespace-nowrap shrink-0"
         >
           <Plus className="w-4 h-4" /> Nuevo viaje
         </button>
