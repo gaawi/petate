@@ -4,8 +4,8 @@ import { DoorOpen, MapPin, Plus, SquarePen, Trash2 } from 'lucide-react'
 import { api } from '../api'
 import type { Wardrobe, Location, Garment, FamilyMember, Suitcase } from '../types'
 import Modal from '../components/Modal'
-import GarmentCard from '../components/GarmentCard'
 import GarmentForm from '../components/GarmentForm'
+import GarmentGrid from '../components/GarmentGrid'
 
 export default function Wardrobes() {
   const [wardrobes, setWardrobes] = useState<Wardrobe[]>([])
@@ -173,24 +173,18 @@ export default function Wardrobes() {
                   Añadir prenda aquí
                 </button>
               </div>
-              {garments.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
-                  <DoorOpen className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <div>Este armario está vacío</div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {garments.map(g => (
-                    <GarmentCard
-                      key={g.id}
-                      garment={g}
-                      onEdit={g => { setEditingGarment(g); setShowAddGarment(true) }}
-                      onDelete={handleDeleteGarment}
-                      onDuplicate={handleDuplicateGarment}
-                    />
-                  ))}
-                </div>
-              )}
+              <GarmentGrid
+                garments={garments}
+                onEdit={g => { setEditingGarment(g); setShowAddGarment(true) }}
+                onDelete={handleDeleteGarment}
+                onDuplicate={handleDuplicateGarment}
+                empty={
+                  <div className="text-center py-12 text-gray-400">
+                    <DoorOpen className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <div>Este armario está vacío</div>
+                  </div>
+                }
+              />
             </>
           ) : (
             <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
