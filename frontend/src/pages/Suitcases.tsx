@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Luggage, MapPin, SquarePen, Trash2, PlaneTakeoff, Plus } from 'lucide-react'
+import { Luggage, MapPin, SquarePen, Trash2, PlaneTakeoff, Plus, PackagePlus } from 'lucide-react'
 import { api } from '../api'
 import type { Suitcase, Location, Garment, FamilyMember, Wardrobe } from '../types'
 import Modal from '../components/Modal'
 import GarmentCard from '../components/GarmentCard'
 import GarmentForm from '../components/GarmentForm'
+import GarmentPicker from '../components/GarmentPicker'
 
-export default function Suitcases() {
+export default function Suitcases({ embedded = false }: { embedded?: boolean }) {
   const [suitcases, setSuitcases] = useState<Suitcase[]>([])
   const [locations, setLocations] = useState<Location[]>([])
   const [members, setMembers] = useState<FamilyMember[]>([])
@@ -20,6 +21,16 @@ export default function Suitcases() {
   const [editingGarment, setEditingGarment] = useState<Garment | null>(null)
   const [form, setForm] = useState({ name: '', current_location_id: '' })
   const [moveTarget, setMoveTarget] = useState('')
+  const [showPicker, setShowPicker] = useState(false)
+
+  const handlePickExisting = async (ids: number[]) => {
+    if (!selected) return
+    await api.garments.move(ids, { suitcase_id: selected.id })
+    setShowPicker(false)
+    const gs = await api.garments.list({ suitcase_id: String(selected.id) })
+    setGarments(gs)
+    setSuitcases(ss => ss.map(s => s.id === selected.id ? { ...s, garment_count: gs.length } : s))
+  }
 
   useEffect(() => {
     Promise.all([api.suitcases.list(), api.locations.list(), api.members.list(), api.wardrobes.list()])
@@ -80,9 +91,11 @@ export default function Suitcases() {
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className={embedded ? '' : 'p-4 md:p-6'}>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="ios-large-title">Maletas</h1>
+        {embedded
+          ? <p className="text-sm text-gray-400">Tus maletas y lo que llevan dentro</p>
+          : <h1 className="ios-large-title">Maletas</h1>}
         <button
           onClick={() => { setForm({ name: '', current_location_id: '' }); setEditSuitcase(null); setShowAdd(true) }}
           className="ios-btn-primary"
@@ -146,20 +159,27 @@ export default function Suitcases() {
                     ) : 'Sin ubicar'}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 justify-end">
                   <button
                     onClick={() => { setMoveTarget(String(selected.current_location_id || '')); setShowMove(true) }}
                     className="flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-xl px-3 py-1.5 font-medium"
                   >
                     <PlaneTakeoff className="w-4 h-4" />
-                    Mover maleta
+                    Mover
+                  </button>
+                  <button
+                    onClick={() => setShowPicker(true)}
+                    className="flex items-center gap-1.5 bg-black/[0.06] text-brand-600 rounded-xl px-3 py-1.5 font-medium"
+                  >
+                    <PackagePlus className="w-4 h-4" />
+                    Añadir ropa
                   </button>
                   <button
                     onClick={() => setShowAddGarment(true)}
                     className="ios-btn-primary"
                   >
                     <Plus className="w-4 h-4" />
-                    Añadir prenda
+                    Nueva prenda
                   </button>
                 </div>
               </div>
@@ -265,6 +285,17 @@ export default function Suitcases() {
             onClose={() => { setShowAddGarment(false); setEditingGarment(null) }}
           />
         </Modal>
+      )}
+
+      {/* Añadir ropa existente (hacer la maleta) */}
+      {showPicker && selected && (
+        <GarmentPicker
+          title={`Añadir ropa a ${selected.name}`}
+          members={members}
+          alreadyInIds={garments.map(g => g.id)}
+          onConfirm={handlePickExisting}
+          onClose={() => setShowPicker(false)}
+        />
       )}
     </div>
   )

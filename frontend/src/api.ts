@@ -326,6 +326,17 @@ export const api = {
       if (error) throw new Error(error.message)
       return { success: true }
     },
+    // Mueve varias prendas a la vez a una maleta o un armario (o las saca: null).
+    // Una prenda está o en armario o en maleta, nunca en ambos.
+    move: async (ids: number[], target: { suitcase_id?: number | null; wardrobe_id?: number | null }) => {
+      if (ids.length === 0) return { success: true }
+      const patch: Record<string, number | null> = {}
+      if ('suitcase_id' in target) { patch.suitcase_id = target.suitcase_id ?? null; patch.wardrobe_id = null }
+      if ('wardrobe_id' in target) { patch.wardrobe_id = target.wardrobe_id ?? null; patch.suitcase_id = null }
+      const { error } = await supabase.from('garments').update(patch).in('id', ids)
+      if (error) throw new Error(error.message)
+      return { success: true }
+    },
   },
 
   // Sube la foto al almacenamiento de Supabase y devuelve su URL pública.

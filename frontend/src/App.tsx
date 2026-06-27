@@ -1,12 +1,11 @@
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './lib/auth'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Garments from './pages/Garments'
 import Wardrobes from './pages/Wardrobes'
-import Suitcases from './pages/Suitcases'
-import Trips from './pages/Trips'
+import Travel from './pages/Travel'
 import Settings from './pages/Settings'
 
 function Gate() {
@@ -28,8 +27,8 @@ function Gate() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/ropa" element={<Garments />} />
         <Route path="/armarios" element={<Wardrobes />} />
-        <Route path="/maletas" element={<Suitcases />} />
-        <Route path="/viajes" element={<Trips />} />
+        <Route path="/viajes" element={<Travel />} />
+        <Route path="/maletas" element={<Navigate to="/viajes?seg=maletas" replace />} />
         <Route path="/ajustes" element={<Settings />} />
       </Routes>
     </Layout>
