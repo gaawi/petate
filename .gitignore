@@ -1,0 +1,9 @@
+node_modules/
+frontend/node_modules/
+backend/petate.db
+backend/petate.db-shm
+backend/petate.db-wal
+uploads/*
+!uploads/.gitkeep
+frontend/dist/
+.env

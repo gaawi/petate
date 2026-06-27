@@ -1,0 +1,21 @@
+{
+  "name": "petate",
+  "version": "1.0.0",
+  "description": "Inventario de ropa familiar",
+  "scripts": {
+    "dev": "concurrently \"node backend/server.js\" \"cd frontend && npm run dev\"",
+    "dev:backend": "node backend/server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install",
+    "start": "node backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
