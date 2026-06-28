@@ -165,6 +165,29 @@ export const getSeasonInfo = (val: string) =>
 export const getFitInfo = (val: string) =>
   FIT_OPTIONS.find(f => f.value === val) ?? { label: val, emoji: '✅' }
 
+// ---- Colores (con su muestra) ----
+export const COLORS: { name: string; hex: string }[] = [
+  { name: 'Negro', hex: '#111827' },
+  { name: 'Gris', hex: '#9ca3af' },
+  { name: 'Blanco', hex: '#ffffff' },
+  { name: 'Beige', hex: '#e7d8b1' },
+  { name: 'Marrón', hex: '#92400e' },
+  { name: 'Azul', hex: '#3b82f6' },
+  { name: 'Azul marino', hex: '#1e3a8a' },
+  { name: 'Celeste', hex: '#7dd3fc' },
+  { name: 'Verde', hex: '#22c55e' },
+  { name: 'Verde oscuro', hex: '#166534' },
+  { name: 'Rojo', hex: '#ef4444' },
+  { name: 'Granate', hex: '#7f1d1d' },
+  { name: 'Rosa', hex: '#ec4899' },
+  { name: 'Naranja', hex: '#f97316' },
+  { name: 'Amarillo', hex: '#eab308' },
+  { name: 'Morado', hex: '#8b5cf6' },
+  { name: 'Dorado', hex: '#d4af37' },
+  { name: 'Plateado', hex: '#c0c0c0' },
+  { name: 'Multicolor', hex: 'multi' },
+]
+
 // ---- Marcas ----
 export const DEFAULT_BRANDS = [
   'Zara', 'H&M', 'Mango', 'Uniqlo', 'Muji', 'Sfera',

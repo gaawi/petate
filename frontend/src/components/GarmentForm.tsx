@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import type { ComponentType } from 'react'
 import { ImagePlus, X, DoorOpen, Luggage, Ban, Minus, Plus } from 'lucide-react'
 import type { Garment, FamilyMember, Wardrobe, Suitcase, Shelf } from '../types'
-import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS, getCategoryInfo, getBrands, addBrand } from '../types'
+import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS, COLORS, getCategoryInfo, getBrands, addBrand } from '../types'
 import { api } from '../api'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
 
@@ -238,16 +238,32 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         </div>
       </div>
 
-      {/* Color (el nombre se genera solo) */}
+      {/* Color (pills con muestra) */}
       <div>
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
-        <input
-          type="text"
-          value={form.color}
-          onChange={e => set('color', e.target.value)}
-          placeholder="Ej: azul marino"
-          className="ios-field"
-        />
+        <div className="flex flex-wrap gap-1.5">
+          {COLORS.map(c => {
+            const selected = form.color === c.name
+            return (
+              <button
+                key={c.name}
+                type="button"
+                onClick={() => set('color', selected ? '' : c.name)}
+                className={`inline-flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full border text-sm transition-all ${
+                  selected ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium' : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                }`}
+              >
+                <span
+                  className="w-4 h-4 rounded-full border border-black/10 flex-shrink-0"
+                  style={c.hex === 'multi'
+                    ? { background: 'conic-gradient(#ef4444,#eab308,#22c55e,#3b82f6,#8b5cf6,#ef4444)' }
+                    : { backgroundColor: c.hex }}
+                />
+                {c.name}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Marca (pills) */}
