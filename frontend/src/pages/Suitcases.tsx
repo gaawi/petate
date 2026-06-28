@@ -23,13 +23,13 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
   const [moveTarget, setMoveTarget] = useState('')
   const [showPicker, setShowPicker] = useState(false)
 
-  const handlePickExisting = async (ids: number[]) => {
+  const handlePickExisting = async (selections: import('../components/GarmentPicker').PickSelection[]) => {
     if (!selected) return
-    await api.garments.move(ids, { suitcase_id: selected.id })
+    await api.garments.moveQty(selections, { suitcase_id: selected.id })
     setShowPicker(false)
-    const gs = await api.garments.list({ suitcase_id: String(selected.id) })
+    const [gs, ss] = await Promise.all([api.garments.list({ suitcase_id: String(selected.id) }), api.suitcases.list()])
     setGarments(gs)
-    setSuitcases(ss => ss.map(s => s.id === selected.id ? { ...s, garment_count: gs.length } : s))
+    setSuitcases(ss)
   }
 
   useEffect(() => {

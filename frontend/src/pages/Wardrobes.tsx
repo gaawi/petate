@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DoorOpen, MapPin, Plus, SquarePen, Trash2, Boxes, X } from 'lucide-react'
+import { DoorOpen, MapPin, Plus, SquarePen, Trash2, Boxes, X, PackagePlus } from 'lucide-react'
 import { api } from '../api'
 import type { Wardrobe, Location, Garment, FamilyMember, Suitcase, Shelf } from '../types'
 import Modal from '../components/Modal'
 import GarmentForm from '../components/GarmentForm'
 import GarmentGrid from '../components/GarmentGrid'
+import GarmentPicker from '../components/GarmentPicker'
 
 export default function Wardrobes() {
   const [wardrobes, setWardrobes] = useState<Wardrobe[]>([])
@@ -21,6 +22,26 @@ export default function Wardrobes() {
   const [form, setForm] = useState({ name: '', location_id: '' })
   const [shelves, setShelves] = useState<Shelf[]>([])
   const [shelfFilter, setShelfFilter] = useState<number | 'all' | 'none'>('all')
+  const [showPicker, setShowPicker] = useState(false)
+
+  const reloadWardrobe = async (w: Wardrobe) => {
+    const [gs, ws, sh] = await Promise.all([
+      api.garments.list({ wardrobe_id: String(w.id) }),
+      api.wardrobes.list(),
+      api.shelves.list(w.id),
+    ])
+    setGarments(gs); setWardrobes(ws); setShelves(sh)
+  }
+
+  const handlePickExisting = async (selections: import('../components/GarmentPicker').PickSelection[]) => {
+    if (!selected) return
+    await api.garments.moveQty(selections, {
+      wardrobe_id: selected.id,
+      shelf_id: typeof shelfFilter === 'number' ? shelfFilter : null,
+    })
+    setShowPicker(false)
+    await reloadWardrobe(selected)
+  }
 
   const shownGarments = shelfFilter === 'all'
     ? garments
@@ -192,13 +213,22 @@ export default function Wardrobes() {
                     )}
                   </div>
                 </div>
-                <button
-                  onClick={() => setShowAddGarment(true)}
-                  className="bg-brand-600 text-white rounded-xl px-3 py-2 font-medium flex items-center gap-1.5 whitespace-nowrap shrink-0 text-[13px]"
-                >
-                  <Plus className="w-4 h-4" />
-                  Añadir
-                </button>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => setShowPicker(true)}
+                    className="flex items-center gap-1.5 bg-black/[0.06] text-brand-600 rounded-xl px-3 py-2 font-medium whitespace-nowrap text-[13px]"
+                  >
+                    <PackagePlus className="w-4 h-4" />
+                    Añadir ropa
+                  </button>
+                  <button
+                    onClick={() => setShowAddGarment(true)}
+                    className="flex items-center gap-1.5 bg-brand-600 text-white rounded-xl px-3 py-2 font-medium whitespace-nowrap text-[13px]"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Nueva
+                  </button>
+                </div>
               </div>
 
               {/* Estanterías / cajas */}
@@ -297,6 +327,17 @@ export default function Wardrobes() {
             onClose={() => { setShowAddGarment(false); setEditingGarment(null) }}
           />
         </Modal>
+      )}
+
+      {/* Añadir ropa existente al armario (mover / repartir cantidades) */}
+      {showPicker && selected && (
+        <GarmentPicker
+          title={`Añadir ropa a ${selected.name}`}
+          members={members}
+          alreadyInIds={garments.map(g => g.id)}
+          onConfirm={handlePickExisting}
+          onClose={() => setShowPicker(false)}
+        />
       )}
     </div>
   )

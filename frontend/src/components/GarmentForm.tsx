@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ComponentType } from 'react'
-import { ImagePlus, X, Star, DoorOpen, Luggage, Ban, Minus, Plus } from 'lucide-react'
+import { ImagePlus, X, DoorOpen, Luggage, Ban, Minus, Plus } from 'lucide-react'
 import type { Garment, FamilyMember, Wardrobe, Suitcase, Shelf } from '../types'
 import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS } from '../types'
 import { api } from '../api'
@@ -251,6 +251,18 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         </div>
       </div>
 
+      {/* Color (justo después del título) */}
+      <div>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
+        <input
+          type="text"
+          value={form.color}
+          onChange={e => set('color', e.target.value)}
+          placeholder="Ej: azul marino"
+          className="ios-field"
+        />
+      </div>
+
       {/* Category */}
       <div>
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Tipo de prenda</label>
@@ -395,26 +407,6 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         <OptionGroup options={FIT_OPTIONS} value={form.fit} onChange={v => set('fit', v)} Icon={FitIcon} />
       </div>
 
-      {/* Rating */}
-      <div>
-        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Valoración</label>
-        <div className="flex gap-2 items-center">
-          {[1, 2, 3, 4, 5].map(i => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => set('rating', i)}
-              className="transition-transform hover:scale-110"
-            >
-              <Star className={`w-7 h-7 ${i <= form.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
-            </button>
-          ))}
-          <span className="text-sm text-gray-400 ml-2">
-            {['', 'No me gusta', 'Regular', 'Bien', 'Me gusta', 'Me encanta'][form.rating]}
-          </span>
-        </div>
-      </div>
-
       {/* Cantidad */}
       <div>
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Cantidad (prendas iguales)</label>
@@ -438,28 +430,16 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         </div>
       </div>
 
-      {/* Color + Notes */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
-          <input
-            type="text"
-            value={form.color}
-            onChange={e => set('color', e.target.value)}
-            placeholder="Ej: azul marino"
-            className="ios-field"
-          />
-        </div>
-        <div>
-          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Notas</label>
-          <input
-            type="text"
-            value={form.notes}
-            onChange={e => set('notes', e.target.value)}
-            placeholder="Notas adicionales..."
-            className="ios-field"
-          />
-        </div>
+      {/* Notes */}
+      <div>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Notas</label>
+        <input
+          type="text"
+          value={form.notes}
+          onChange={e => set('notes', e.target.value)}
+          placeholder="Notas adicionales..."
+          className="ios-field"
+        />
       </div>
 
       {/* Actions */}

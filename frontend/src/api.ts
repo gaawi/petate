@@ -393,6 +393,37 @@ export const api = {
       if (error) throw new Error(error.message)
       return { success: true }
     },
+    // Mueve prendas a una maleta o armario, permitiendo mover SOLO una parte de
+    // la cantidad: si mueves 3 de 7, quedan 4 en el origen y se crea una entrada
+    // de 3 en el destino.
+    moveQty: async (
+      items: { garment: Garment; qty: number }[],
+      target: { wardrobe_id?: number | null; suitcase_id?: number | null; shelf_id?: number | null },
+    ) => {
+      const loc = 'suitcase_id' in target
+        ? { suitcase_id: target.suitcase_id ?? null, wardrobe_id: null, shelf_id: null }
+        : { wardrobe_id: target.wardrobe_id ?? null, suitcase_id: null, shelf_id: target.shelf_id ?? null }
+      for (const { garment, qty } of items) {
+        const total = garment.quantity ?? 1
+        if (qty >= total) {
+          const { error } = await supabase.from('garments').update(loc).eq('id', garment.id)
+          if (error) throw new Error(error.message)
+        } else {
+          const { error: e1 } = await supabase.from('garments').update({ quantity: total - qty }).eq('id', garment.id)
+          if (e1) throw new Error(e1.message)
+          const { error: e2 } = await supabase.from('garments').insert({
+            name: garment.name, category: garment.category, owner_id: garment.owner_id ?? null,
+            ...loc,
+            photos: garment.photos ?? [], photo_path: garment.photo_path ?? null,
+            condition: garment.condition, use_type: garment.use_type, fit: garment.fit,
+            season: garment.season, rating: garment.rating, quantity: qty,
+            brand: garment.brand ?? null, color: garment.color ?? null, notes: garment.notes ?? null,
+          })
+          if (e2) throw new Error(e2.message)
+        }
+      }
+      return { success: true }
+    },
   },
 
   // Sube la foto al almacenamiento de Supabase y devuelve su URL pública.

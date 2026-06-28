@@ -1,4 +1,4 @@
-import { SquarePen, Trash2, Star, MapPin, Copy } from 'lucide-react'
+import { SquarePen, Trash2, MapPin, Copy } from 'lucide-react'
 import type { Garment } from '../types'
 import { getCategoryInfo, getConditionInfo, getSeasonInfo, getUseTypeInfo, getFitInfo } from '../types'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
@@ -11,20 +11,6 @@ interface Props {
   onDelete: (g: Garment) => void
   onDuplicate?: (g: Garment) => void
   layout?: 'grid' | 'list'
-}
-
-function Stars({ rating }: { rating: number }) {
-  return (
-    <div className="flex gap-0.5 px-1.5 py-1 rounded-full bg-black/30 backdrop-blur-sm">
-      {[1, 2, 3, 4, 5].map(i => (
-        <Star
-          key={i}
-          className={`w-3 h-3 ${i <= rating ? 'text-amber-400 fill-amber-400' : 'text-white/40'}`}
-          strokeWidth={2}
-        />
-      ))}
-    </div>
-  )
 }
 
 function QtyBadge({ n, className = '' }: { n: number; className?: string }) {
@@ -73,7 +59,9 @@ export default function GarmentCard({ garment, onEdit, onDelete, onDuplicate, la
               {garment.owner_color && <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: garment.owner_color }} />}
               <span className="font-semibold text-[15px] text-gray-900 truncate">{garment.name}</span>
             </div>
-            {garment.brand && <div className="text-xs text-gray-400 truncate">{garment.brand}</div>}
+            {(garment.color || garment.brand) && (
+              <div className="text-xs text-gray-400 truncate">{[garment.color, garment.brand].filter(Boolean).join(' · ')}</div>
+            )}
 
             {/* Etiquetas (ahora hay sitio gracias al swipe) */}
             <div className="mt-1 flex flex-wrap gap-1">
@@ -158,16 +146,14 @@ export default function GarmentCard({ garment, onEdit, onDelete, onDuplicate, la
           </button>
         </div>
 
-        {/* Valoración */}
-        <div className="absolute bottom-2 left-2">
-          <Stars rating={garment.rating} />
-        </div>
       </div>
 
       {/* Info */}
       <div className="p-3">
         <div className="font-semibold text-[15px] text-gray-900 truncate">{garment.name}</div>
-        {garment.brand && <div className="text-xs text-gray-400 truncate">{garment.brand}</div>}
+        {(garment.color || garment.brand) && (
+          <div className="text-xs text-gray-400 truncate">{[garment.color, garment.brand].filter(Boolean).join(' · ')}</div>
+        )}
 
         <div className="mt-2 flex flex-wrap gap-1">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-black/[0.05] rounded-full text-[11px] text-gray-600">
