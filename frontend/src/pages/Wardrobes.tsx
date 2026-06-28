@@ -227,7 +227,7 @@ export default function Wardrobes() {
                 <button
                   onClick={createShelf}
                   className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium text-brand-600 bg-brand-50"
-                ><Plus className="w-3.5 h-3.5" /> Estantería</button>
+                ><Plus className="w-3.5 h-3.5" /> Caja/Estante</button>
               </div>
 
               <GarmentGrid
