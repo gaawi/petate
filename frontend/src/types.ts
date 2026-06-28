@@ -28,6 +28,14 @@ export interface Wardrobe {
   created_at: string
 }
 
+export interface Shelf {
+  id: number
+  name: string
+  wardrobe_id: number | null
+  garment_count?: number
+  created_at: string
+}
+
 export interface Suitcase {
   id: number
   name: string
@@ -57,7 +65,9 @@ export interface Garment {
   owner_id: number | null
   wardrobe_id: number | null
   suitcase_id: number | null
+  shelf_id: number | null
   photo_path: string | null
+  photos: string[]
   condition: string
   use_type: string
   fit: string
@@ -74,6 +84,7 @@ export interface Garment {
   wardrobe_name?: string
   wardrobe_location_name?: string
   wardrobe_location_city?: string
+  shelf_name?: string
   suitcase_name?: string
   suitcase_location_name?: string
   suitcase_location_city?: string

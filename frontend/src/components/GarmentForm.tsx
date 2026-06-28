@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ComponentType } from 'react'
 import { ImagePlus, X, Star, DoorOpen, Luggage, Ban, Minus, Plus } from 'lucide-react'
-import type { Garment, FamilyMember, Wardrobe, Suitcase } from '../types'
+import type { Garment, FamilyMember, Wardrobe, Suitcase, Shelf } from '../types'
 import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS } from '../types'
 import { api } from '../api'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
@@ -18,8 +18,8 @@ interface Props {
 const defaultForm = {
   name: '', category: 'camiseta', owner_id: '' as number | '',
   storage_type: 'wardrobe' as 'wardrobe' | 'suitcase' | 'none',
-  wardrobe_id: '' as number | '', suitcase_id: '' as number | '',
-  photo_path: '', condition: 'buena', use_type: 'salir',
+  wardrobe_id: '' as number | '', suitcase_id: '' as number | '', shelf_id: '' as number | '',
+  photos: [] as string[], condition: 'buena', use_type: 'salir',
   fit: 'bien', season: 'todo', rating: 3, quantity: 1, brand: '', color: '', notes: '',
 }
 
@@ -63,7 +63,8 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
       storage_type: garment.wardrobe_id ? 'wardrobe' : garment.suitcase_id ? 'suitcase' : 'none' as 'wardrobe' | 'suitcase' | 'none',
       wardrobe_id: garment.wardrobe_id ?? ('' as number | ''),
       suitcase_id: garment.suitcase_id ?? ('' as number | ''),
-      photo_path: garment.photo_path ?? '',
+      shelf_id: garment.shelf_id ?? ('' as number | ''),
+      photos: garment.photos?.length ? garment.photos : (garment.photo_path ? [garment.photo_path] : []),
       condition: garment.condition,
       use_type: garment.use_type,
       fit: garment.fit,
@@ -79,22 +80,48 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [shelves, setShelves] = useState<Shelf[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
 
   const set = (key: keyof typeof form, val: unknown) => setForm(f => ({ ...f, [key]: val }))
 
-  const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) return
+  // Carga las estanterías del armario elegido
+  useEffect(() => {
+    if (form.storage_type === 'wardrobe' && form.wardrobe_id !== '') {
+      api.shelves.list(Number(form.wardrobe_id)).then(setShelves).catch(() => setShelves([]))
+    } else {
+      setShelves([])
+    }
+  }, [form.storage_type, form.wardrobe_id])
+
+  const createShelf = async () => {
+    const name = window.prompt('Nombre de la estantería o caja (p. ej. "Estante superior", "Caja zapatos")')
+    if (!name?.trim() || form.wardrobe_id === '') return
+    const shelf = await api.shelves.create({ name: name.trim(), wardrobe_id: Number(form.wardrobe_id) })
+    setShelves(prev => [...prev, shelf])
+    set('shelf_id', shelf.id)
+  }
+
+  const handleFiles = async (files: FileList | File[]) => {
+    const imgs = Array.from(files).filter(f => f.type.startsWith('image/'))
+    if (!imgs.length) return
     setUploading(true)
     try {
-      const path = await api.upload(file)
-      set('photo_path', path)
+      const urls = await Promise.all(imgs.map(f => api.upload(f)))
+      setForm(f => ({ ...f, photos: [...f.photos, ...urls] }))
     } catch (e) {
-      alert('Error subiendo la foto')
+      alert('Error subiendo las fotos')
     } finally {
       setUploading(false)
     }
   }
+
+  const removePhoto = (i: number) => setForm(f => ({ ...f, photos: f.photos.filter((_, idx) => idx !== i) }))
+  const makeCover = (i: number) => setForm(f => {
+    const next = [...f.photos]
+    const [p] = next.splice(i, 1)
+    return { ...f, photos: [p, ...next] }
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -107,7 +134,9 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         owner_id: form.owner_id !== '' ? Number(form.owner_id) : null,
         wardrobe_id: form.storage_type === 'wardrobe' && form.wardrobe_id !== '' ? Number(form.wardrobe_id) : null,
         suitcase_id: form.storage_type === 'suitcase' && form.suitcase_id !== '' ? Number(form.suitcase_id) : null,
-        photo_path: form.photo_path || null,
+        shelf_id: form.storage_type === 'wardrobe' && form.shelf_id !== '' ? Number(form.shelf_id) : null,
+        photos: form.photos,
+        photo_path: form.photos[0] || null,
         condition: form.condition,
         use_type: form.use_type,
         fit: form.fit,
@@ -131,53 +160,68 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Photo upload */}
+      {/* Fotos (varias) */}
       <div>
-        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Foto</label>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">
+          Fotos {form.photos.length > 0 && <span className="text-gray-400">· {form.photos.length}</span>}
+        </label>
         <div
-          className={`relative border-2 border-dashed rounded-xl overflow-hidden transition-colors ${
-            dragOver ? 'border-brand-400 bg-brand-50' : 'border-gray-200 hover:border-gray-300'
-          }`}
-          style={{ height: form.photo_path ? 'auto' : '140px' }}
+          className={`rounded-xl transition-colors ${dragOver ? 'bg-brand-50 ring-2 ring-brand-300' : ''}`}
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
-          onDrop={e => {
-            e.preventDefault()
-            setDragOver(false)
-            const file = e.dataTransfer.files[0]
-            if (file) handleFile(file)
-          }}
-          onClick={() => fileRef.current?.click()}
+          onDrop={e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files) }}
         >
-          {form.photo_path ? (
-            <div className="relative">
-              <img src={form.photo_path} alt="Preview" className="w-full max-h-64 object-contain" />
-              <button
-                type="button"
-                onClick={e => { e.stopPropagation(); set('photo_path', '') }}
-                className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow text-red-500 hover:text-red-700"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-400 cursor-pointer">
+          <div className="flex flex-wrap gap-2">
+            {form.photos.map((p, i) => (
+              <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden bg-gray-100 group">
+                <img src={p} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                {i === 0 && (
+                  <span className="absolute bottom-0 inset-x-0 bg-brand-600 text-white text-[10px] text-center py-0.5 font-medium">Portada</span>
+                )}
+                {i !== 0 && (
+                  <button
+                    type="button"
+                    onClick={() => makeCover(i)}
+                    title="Hacer portada"
+                    className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Portada
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-black/55 rounded-full text-white"
+                  aria-label="Quitar foto"
+                >
+                  <X className="w-3 h-3" strokeWidth={2.5} />
+                </button>
+              </div>
+            ))}
+
+            {/* Añadir más */}
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 hover:border-brand-300 flex flex-col items-center justify-center gap-1 text-gray-400"
+            >
               {uploading ? (
-                <div className="text-sm">Subiendo...</div>
+                <span className="text-[11px]">Subiendo…</span>
               ) : (
                 <>
-                  <ImagePlus className="w-8 h-8 text-gray-400" />
-                  <span className="text-sm">Haz clic o arrastra una foto</span>
+                  <ImagePlus className="w-6 h-6" />
+                  <span className="text-[10px]">Añadir</span>
                 </>
               )}
-            </div>
-          )}
+            </button>
+          </div>
           <input
             ref={fileRef}
             type="file"
             accept="image/*"
+            multiple
             className="hidden"
-            onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
+            onChange={e => { if (e.target.files?.length) handleFiles(e.target.files); e.target.value = '' }}
           />
         </div>
       </div>
@@ -281,18 +325,35 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
           ))}
         </div>
         {form.storage_type === 'wardrobe' && (
-          <select
-            value={form.wardrobe_id}
-            onChange={e => set('wardrobe_id', e.target.value ? Number(e.target.value) : '')}
-            className="ios-field"
-          >
-            <option value="">Selecciona un armario</option>
-            {wardrobes.map(w => (
-              <option key={w.id} value={w.id}>
-                {w.name}{w.location_name ? ` (${w.location_name})` : ''}
-              </option>
-            ))}
-          </select>
+          <div className="space-y-2">
+            <select
+              value={form.wardrobe_id}
+              onChange={e => setForm(f => ({ ...f, wardrobe_id: e.target.value ? Number(e.target.value) : '', shelf_id: '' }))}
+              className="ios-field"
+            >
+              <option value="">Selecciona un armario</option>
+              {wardrobes.map(w => (
+                <option key={w.id} value={w.id}>
+                  {w.name}{w.location_name ? ` (${w.location_name})` : ''}
+                </option>
+              ))}
+            </select>
+            {form.wardrobe_id !== '' && (
+              <div className="flex gap-2">
+                <select
+                  value={form.shelf_id}
+                  onChange={e => set('shelf_id', e.target.value ? Number(e.target.value) : '')}
+                  className="ios-field"
+                >
+                  <option value="">Sin estantería / caja</option>
+                  {shelves.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+                <button type="button" onClick={createShelf} className="ios-btn-secondary whitespace-nowrap px-3">
+                  <Plus className="w-4 h-4" /> Nueva
+                </button>
+              </div>
+            )}
+          </div>
         )}
         {form.storage_type === 'suitcase' && (
           <select

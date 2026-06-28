@@ -1,4 +1,4 @@
-import type { FamilyMember, Location, Wardrobe, Suitcase, Trip, Garment } from './types'
+import type { FamilyMember, Location, Wardrobe, Suitcase, Shelf, Trip, Garment } from './types'
 import { supabase, PHOTO_BUCKET } from './lib/supabase'
 
 // ============================================================================
@@ -17,6 +17,8 @@ function check<T>(data: T | null, error: { message: string } | null): T {
 function flatGarment(g: any): Garment {
   return {
     ...g,
+    photos: Array.isArray(g.photos) ? g.photos : [],
+    shelf_name: g.shelf?.name ?? undefined,
     owner_name: g.owner?.name ?? undefined,
     owner_color: g.owner?.color ?? undefined,
     owner_role: g.owner?.role ?? undefined,
@@ -53,7 +55,8 @@ const GARMENT_SELECT = `
   *,
   owner:family_members(id,name,color,role),
   wardrobe:wardrobes(id,name,location:locations(id,name,city)),
-  suitcase:suitcases(id,name,location:locations(id,name,city))
+  suitcase:suitcases(id,name,location:locations(id,name,city)),
+  shelf:shelves(id,name)
 `
 
 export const api = {
@@ -144,6 +147,37 @@ export const api = {
     },
     delete: async (id: number) => {
       const { error } = await supabase.from('wardrobes').delete().eq('id', id)
+      if (error) throw new Error(error.message)
+      return { success: true }
+    },
+  },
+
+  // Estanterías / cajas dentro de un armario
+  shelves: {
+    list: async (wardrobeId: number): Promise<Shelf[]> => {
+      const { data, error } = await supabase
+        .from('shelves')
+        .select('*, garments(count)')
+        .eq('wardrobe_id', wardrobeId)
+        .order('id')
+      return check(data, error).map((s: any) => ({ ...s, garment_count: s.garments?.[0]?.count ?? 0 }))
+    },
+    create: async (d: { name: string; wardrobe_id: number }): Promise<Shelf> => {
+      const { data, error } = await supabase
+        .from('shelves')
+        .insert({ name: d.name, wardrobe_id: d.wardrobe_id })
+        .select('*, garments(count)').single()
+      return { ...check(data, error), garment_count: 0 }
+    },
+    update: async (id: number, d: { name: string }): Promise<Shelf> => {
+      const { data, error } = await supabase
+        .from('shelves')
+        .update({ name: d.name })
+        .eq('id', id).select('*, garments(count)').single()
+      return check(data, error)
+    },
+    delete: async (id: number) => {
+      const { error } = await supabase.from('shelves').delete().eq('id', id)
       if (error) throw new Error(error.message)
       return { success: true }
     },
@@ -261,6 +295,7 @@ export const api = {
         if (filters.fit) q = q.eq('fit', filters.fit)
         if (filters.wardrobe_id) q = q.eq('wardrobe_id', filters.wardrobe_id)
         if (filters.suitcase_id) q = q.eq('suitcase_id', filters.suitcase_id)
+        if (filters.shelf_id) q = q.eq('shelf_id', filters.shelf_id)
         if (filters.search) {
           const s = filters.search.replace(/[%,]/g, '')
           q = q.or(`name.ilike.%${s}%,brand.ilike.%${s}%,notes.ilike.%${s}%`)
@@ -301,9 +336,11 @@ export const api = {
         .insert({
           name: d.name, category: d.category || 'otros', owner_id: d.owner_id ?? null,
           wardrobe_id: d.wardrobe_id ?? null, suitcase_id: d.suitcase_id ?? null,
-          photo_path: d.photo_path ?? null, condition: d.condition || 'buena',
+          shelf_id: d.shelf_id ?? null,
+          condition: d.condition || 'buena',
           use_type: d.use_type || 'salir', fit: d.fit || 'bien', season: d.season || 'todo',
           rating: d.rating ?? 3, quantity: d.quantity ?? 1,
+          photos: d.photos ?? [], photo_path: (d.photos && d.photos[0]) ?? d.photo_path ?? null,
           brand: d.brand ?? null, color: d.color ?? null, notes: d.notes ?? null,
         })
         .select(GARMENT_SELECT).single()
@@ -315,7 +352,9 @@ export const api = {
         .update({
           name: d.name, category: d.category, owner_id: d.owner_id ?? null,
           wardrobe_id: d.wardrobe_id ?? null, suitcase_id: d.suitcase_id ?? null,
-          photo_path: d.photo_path ?? null, condition: d.condition, use_type: d.use_type,
+          shelf_id: d.shelf_id ?? null,
+          photos: d.photos ?? [], photo_path: (d.photos && d.photos[0]) ?? d.photo_path ?? null,
+          condition: d.condition, use_type: d.use_type,
           fit: d.fit, season: d.season, rating: d.rating, quantity: d.quantity ?? 1,
           brand: d.brand ?? null, color: d.color ?? null, notes: d.notes ?? null,
         })
@@ -329,7 +368,9 @@ export const api = {
         .insert({
           name: g.name, category: g.category, owner_id: g.owner_id ?? null,
           wardrobe_id: g.wardrobe_id ?? null, suitcase_id: g.suitcase_id ?? null,
-          photo_path: g.photo_path ?? null, condition: g.condition, use_type: g.use_type,
+          shelf_id: g.shelf_id ?? null,
+          photos: g.photos ?? [], photo_path: g.photo_path ?? null,
+          condition: g.condition, use_type: g.use_type,
           fit: g.fit, season: g.season, rating: g.rating, quantity: g.quantity ?? 1,
           brand: g.brand ?? null, color: g.color ?? null, notes: g.notes ?? null,
         })
@@ -346,8 +387,8 @@ export const api = {
     move: async (ids: number[], target: { suitcase_id?: number | null; wardrobe_id?: number | null }) => {
       if (ids.length === 0) return { success: true }
       const patch: Record<string, number | null> = {}
-      if ('suitcase_id' in target) { patch.suitcase_id = target.suitcase_id ?? null; patch.wardrobe_id = null }
-      if ('wardrobe_id' in target) { patch.wardrobe_id = target.wardrobe_id ?? null; patch.suitcase_id = null }
+      if ('suitcase_id' in target) { patch.suitcase_id = target.suitcase_id ?? null; patch.wardrobe_id = null; patch.shelf_id = null }
+      if ('wardrobe_id' in target) { patch.wardrobe_id = target.wardrobe_id ?? null; patch.suitcase_id = null; patch.shelf_id = null }
       const { error } = await supabase.from('garments').update(patch).in('id', ids)
       if (error) throw new Error(error.message)
       return { success: true }

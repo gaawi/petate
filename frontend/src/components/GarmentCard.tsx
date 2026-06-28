@@ -3,6 +3,7 @@ import type { Garment } from '../types'
 import { getCategoryInfo, getConditionInfo, getSeasonInfo, getUseTypeInfo, getFitInfo } from '../types'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
 import SwipeableRow from './SwipeableRow'
+import ImageCarousel from './ImageCarousel'
 
 interface Props {
   garment: Garment
@@ -43,10 +44,12 @@ export default function GarmentCard({ garment, onEdit, onDelete, onDuplicate, la
   const fit = getFitInfo(garment.fit)
 
   const locationStr = garment.wardrobe_name
-    ? `${garment.wardrobe_name}${garment.wardrobe_location_city ? ` · ${garment.wardrobe_location_city}` : ''}`
+    ? `${garment.wardrobe_name}${garment.shelf_name ? ` · ${garment.shelf_name}` : ''}${garment.wardrobe_location_city ? ` · ${garment.wardrobe_location_city}` : ''}`
     : garment.suitcase_name
     ? `${garment.suitcase_name}${garment.suitcase_location_city ? ` · ${garment.suitcase_location_city}` : ''}`
     : null
+
+  const photos = garment.photos?.length ? garment.photos : (garment.photo_path ? [garment.photo_path] : [])
 
   // ---------- Vista LISTA (con swipe iOS) ----------
   if (layout === 'list') {
@@ -105,10 +108,10 @@ export default function GarmentCard({ garment, onEdit, onDelete, onDuplicate, la
   // ---------- Vista TARJETA (grid) ----------
   return (
     <div className="ios-card overflow-hidden group">
-      {/* Foto */}
+      {/* Foto(s) */}
       <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
-        {garment.photo_path ? (
-          <img src={garment.photo_path} alt={garment.name} className="w-full h-full object-cover" />
+        {photos.length ? (
+          <ImageCarousel photos={photos} alt={garment.name} className="w-full h-full" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <CategoryIcon value={garment.category} className="w-16 h-16 text-gray-300" />

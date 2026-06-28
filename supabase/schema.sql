@@ -57,6 +57,14 @@ create table if not exists trip_suitcases (
   primary key (trip_id, suitcase_id)
 );
 
+-- Estanterías / cajas dentro de un armario
+create table if not exists shelves (
+  id          bigint generated always as identity primary key,
+  name        text not null,
+  wardrobe_id bigint references wardrobes(id) on delete cascade,
+  created_at  timestamptz not null default now()
+);
+
 create table if not exists garments (
   id           bigint generated always as identity primary key,
   name         text not null,
@@ -64,12 +72,15 @@ create table if not exists garments (
   owner_id     bigint references family_members(id) on delete set null,
   wardrobe_id  bigint references wardrobes(id) on delete set null,
   suitcase_id  bigint references suitcases(id) on delete set null,
+  shelf_id     bigint references shelves(id) on delete set null,
   photo_path   text,
+  photos       text[] not null default '{}',
   condition    text default 'buena',
   use_type     text default 'salir',
   fit          text default 'bien',
   season       text default 'todo',
   rating       int  default 3,
+  quantity     int  not null default 1,
   brand        text,
   color        text,
   notes        text,
@@ -121,6 +132,7 @@ where not exists (select 1 from suitcases);
 alter table family_members  enable row level security;
 alter table locations       enable row level security;
 alter table wardrobes       enable row level security;
+alter table shelves         enable row level security;
 alter table suitcases       enable row level security;
 alter table trips           enable row level security;
 alter table trip_suitcases  enable row level security;
@@ -129,7 +141,7 @@ alter table garments        enable row level security;
 do $$
 declare t text;
 begin
-  foreach t in array array['family_members','locations','wardrobes','suitcases','trips','trip_suitcases','garments']
+  foreach t in array array['family_members','locations','wardrobes','shelves','suitcases','trips','trip_suitcases','garments']
   loop
     execute format('drop policy if exists "acceso autenticado" on %I;', t);
     execute format(

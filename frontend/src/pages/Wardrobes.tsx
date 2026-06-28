@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DoorOpen, MapPin, Plus, SquarePen, Trash2 } from 'lucide-react'
+import { DoorOpen, MapPin, Plus, SquarePen, Trash2, Boxes, X } from 'lucide-react'
 import { api } from '../api'
-import type { Wardrobe, Location, Garment, FamilyMember, Suitcase } from '../types'
+import type { Wardrobe, Location, Garment, FamilyMember, Suitcase, Shelf } from '../types'
 import Modal from '../components/Modal'
 import GarmentForm from '../components/GarmentForm'
 import GarmentGrid from '../components/GarmentGrid'
@@ -19,6 +19,14 @@ export default function Wardrobes() {
   const [showAddGarment, setShowAddGarment] = useState(false)
   const [editingGarment, setEditingGarment] = useState<Garment | null>(null)
   const [form, setForm] = useState({ name: '', location_id: '' })
+  const [shelves, setShelves] = useState<Shelf[]>([])
+  const [shelfFilter, setShelfFilter] = useState<number | 'all' | 'none'>('all')
+
+  const shownGarments = shelfFilter === 'all'
+    ? garments
+    : shelfFilter === 'none'
+    ? garments.filter(g => !g.shelf_id)
+    : garments.filter(g => g.shelf_id === shelfFilter)
 
   useEffect(() => {
     Promise.all([api.wardrobes.list(), api.locations.list(), api.members.list(), api.suitcases.list()])
@@ -27,7 +35,25 @@ export default function Wardrobes() {
 
   const loadGarments = (w: Wardrobe) => {
     setSelected(w)
+    setShelfFilter('all')
     api.garments.list({ wardrobe_id: String(w.id) }).then(setGarments)
+    api.shelves.list(w.id).then(setShelves).catch(() => setShelves([]))
+  }
+
+  const createShelf = async () => {
+    if (!selected) return
+    const name = window.prompt('Nombre de la estantería o caja (p. ej. "Estante superior", "Caja zapatos")')
+    if (!name?.trim()) return
+    const shelf = await api.shelves.create({ name: name.trim(), wardrobe_id: selected.id })
+    setShelves(prev => [...prev, shelf])
+  }
+
+  const deleteShelf = async (s: Shelf) => {
+    if (!confirm(`¿Eliminar "${s.name}"? La ropa que tenga dentro quedará sin estantería.`)) return
+    await api.shelves.delete(s.id)
+    setShelves(prev => prev.filter(x => x.id !== s.id))
+    if (shelfFilter === s.id) setShelfFilter('all')
+    if (selected) api.garments.list({ wardrobe_id: String(selected.id) }).then(setGarments)
   }
 
   const handleSaveWardrobe = async () => {
@@ -174,15 +200,45 @@ export default function Wardrobes() {
                   Añadir
                 </button>
               </div>
+
+              {/* Estanterías / cajas */}
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 mb-3 items-center">
+                <button
+                  onClick={() => setShelfFilter('all')}
+                  className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium ${shelfFilter === 'all' ? 'bg-gray-900 text-white' : 'bg-black/[0.06] text-gray-600'}`}
+                >Todo</button>
+                {shelves.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => setShelfFilter(s.id)}
+                    className={`group flex-shrink-0 inline-flex items-center gap-1 pl-2.5 pr-2 py-1 rounded-full text-xs font-medium ${shelfFilter === s.id ? 'bg-brand-600 text-white' : 'bg-black/[0.06] text-gray-600'}`}
+                  >
+                    <Boxes className="w-3.5 h-3.5" /> {s.name}
+                    <span className="opacity-60">{s.garment_count ?? 0}</span>
+                    <span onClick={e => { e.stopPropagation(); deleteShelf(s) }} className="ml-0.5 opacity-0 group-hover:opacity-100"><X className="w-3 h-3" /></span>
+                  </button>
+                ))}
+                {garments.some(g => !g.shelf_id) && (
+                  <button
+                    onClick={() => setShelfFilter('none')}
+                    className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium ${shelfFilter === 'none' ? 'bg-brand-600 text-white' : 'bg-black/[0.06] text-gray-400'}`}
+                  >Sin estantería</button>
+                )}
+                <button
+                  onClick={createShelf}
+                  className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium text-brand-600 bg-brand-50"
+                ><Plus className="w-3.5 h-3.5" /> Estantería</button>
+              </div>
+
               <GarmentGrid
-                garments={garments}
+                garments={shownGarments}
                 onEdit={g => { setEditingGarment(g); setShowAddGarment(true) }}
                 onDelete={handleDeleteGarment}
                 onDuplicate={handleDuplicateGarment}
                 empty={
                   <div className="text-center py-12 text-gray-400">
                     <DoorOpen className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                    <div>Este armario está vacío</div>
+                    <div>{shelfFilter === 'all' ? 'Este armario está vacío' : 'Nada en esta estantería'}</div>
                   </div>
                 }
               />
