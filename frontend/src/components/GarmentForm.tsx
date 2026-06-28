@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import type { ComponentType } from 'react'
 import { ImagePlus, X, DoorOpen, Luggage, Ban, Minus, Plus } from 'lucide-react'
 import type { Garment, FamilyMember, Wardrobe, Suitcase, Shelf } from '../types'
-import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS, getCategoryInfo } from '../types'
+import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS, getCategoryInfo, getBrands, addBrand } from '../types'
 import { api } from '../api'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
 
@@ -85,7 +85,16 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [shelves, setShelves] = useState<Shelf[]>([])
+  const [brands, setBrands] = useState<string[]>(getBrands())
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const newBrand = () => {
+    const name = window.prompt('Nueva marca')
+    if (!name?.trim()) return
+    addBrand(name)
+    setBrands(getBrands())
+    set('brand', name.trim())
+  }
 
   const set = (key: keyof typeof form, val: unknown) => setForm(f => ({ ...f, [key]: val }))
 
@@ -229,30 +238,47 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         </div>
       </div>
 
-      {/* Color + marca (el nombre se genera solo) */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
-          <input
-            type="text"
-            value={form.color}
-            onChange={e => set('color', e.target.value)}
-            placeholder="Ej: azul marino"
-            className="ios-field"
-          />
-        </div>
-        <div>
-          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Marca</label>
-          <input
-            type="text"
-            value={form.brand}
-            onChange={e => set('brand', e.target.value)}
-            placeholder="Ej: Zara, Nike..."
-            className="ios-field"
-          />
+      {/* Color (el nombre se genera solo) */}
+      <div>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
+        <input
+          type="text"
+          value={form.color}
+          onChange={e => set('color', e.target.value)}
+          placeholder="Ej: azul marino"
+          className="ios-field"
+        />
+      </div>
+
+      {/* Marca (pills) */}
+      <div>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Marca</label>
+        <div className="flex flex-wrap gap-1.5">
+          {brands.map(b => (
+            <button
+              key={b}
+              type="button"
+              onClick={() => set('brand', form.brand === b ? '' : b)}
+              className={`px-2.5 py-1 rounded-lg border text-sm transition-all ${
+                form.brand === b
+                  ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
+                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
+              }`}
+            >
+              {b}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={newBrand}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-dashed border-gray-300 text-sm text-brand-600"
+          >
+            <Plus className="w-3.5 h-3.5" /> Otra
+          </button>
         </div>
       </div>
-      <div className="-mt-2 text-xs text-gray-400">
+
+      <div className="text-xs text-gray-400">
         Se llamará: <span className="font-medium text-gray-600">{composeName(form.category, form.color, form.brand)}</span>
       </div>
 

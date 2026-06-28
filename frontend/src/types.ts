@@ -164,3 +164,28 @@ export const getSeasonInfo = (val: string) =>
 
 export const getFitInfo = (val: string) =>
   FIT_OPTIONS.find(f => f.value === val) ?? { label: val, emoji: '✅' }
+
+// ---- Marcas ----
+export const DEFAULT_BRANDS = [
+  'Zara', 'H&M', 'Mango', 'Uniqlo', 'Muji', 'Sfera',
+  'Primark', 'Amazon', 'Hanes', 'Target', "Levi's",
+]
+
+const BRANDS_KEY = 'petate-brands'
+
+function customBrands(): string[] {
+  try { return JSON.parse(localStorage.getItem(BRANDS_KEY) || '[]') } catch { return [] }
+}
+
+// Marcas habituales + las que haya creado el usuario
+export function getBrands(): string[] {
+  const custom = customBrands().filter(b => !DEFAULT_BRANDS.includes(b))
+  return [...DEFAULT_BRANDS, ...custom]
+}
+
+// Guarda una marca nueva para que aparezca la próxima vez
+export function addBrand(name: string): void {
+  const n = name.trim()
+  if (!n || getBrands().some(b => b.toLowerCase() === n.toLowerCase())) return
+  localStorage.setItem(BRANDS_KEY, JSON.stringify([...customBrands(), n]))
+}
