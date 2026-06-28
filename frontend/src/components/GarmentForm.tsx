@@ -238,6 +238,27 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         </div>
       </div>
 
+      {/* Tipo de prenda */}
+      <div>
+        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Tipo de prenda</label>
+        <div className="flex flex-wrap gap-1.5">
+          {CATEGORIES.map(c => (
+            <button
+              key={c.value}
+              type="button"
+              onClick={() => set('category', c.value)}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs transition-all ${
+                form.category === c.value
+                  ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
+                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
+              }`}
+            >
+              <CategoryIcon value={c.value} className="w-4 h-4" /> {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Color (pills con muestra) */}
       <div>
         <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
@@ -296,27 +317,6 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
 
       <div className="text-xs text-gray-400">
         Se llamará: <span className="font-medium text-gray-600">{composeName(form.category, form.color, form.brand)}</span>
-      </div>
-
-      {/* Category */}
-      <div>
-        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Tipo de prenda</label>
-        <div className="flex flex-wrap gap-1.5">
-          {CATEGORIES.map(c => (
-            <button
-              key={c.value}
-              type="button"
-              onClick={() => set('category', c.value)}
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs transition-all ${
-                form.category === c.value
-                  ? 'border-brand-500 bg-brand-50 text-brand-700 font-medium'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
-              }`}
-            >
-              <CategoryIcon value={c.value} className="w-4 h-4" /> {c.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Owner */}
