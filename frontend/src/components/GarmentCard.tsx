@@ -59,10 +59,6 @@ export default function GarmentCard({ garment, onEdit, onDelete, onDuplicate, la
               {garment.owner_color && <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: garment.owner_color }} />}
               <span className="font-semibold text-[15px] text-gray-900 truncate">{garment.name}</span>
             </div>
-            {(garment.color || garment.brand) && (
-              <div className="text-xs text-gray-400 truncate">{[garment.color, garment.brand].filter(Boolean).join(' · ')}</div>
-            )}
-
             {/* Etiquetas (ahora hay sitio gracias al swipe) */}
             <div className="mt-1 flex flex-wrap gap-1">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-black/[0.05] rounded-full text-[11px] text-gray-600">
@@ -151,9 +147,6 @@ export default function GarmentCard({ garment, onEdit, onDelete, onDuplicate, la
       {/* Info */}
       <div className="p-3">
         <div className="font-semibold text-[15px] text-gray-900 truncate">{garment.name}</div>
-        {(garment.color || garment.brand) && (
-          <div className="text-xs text-gray-400 truncate">{[garment.color, garment.brand].filter(Boolean).join(' · ')}</div>
-        )}
 
         <div className="mt-2 flex flex-wrap gap-1">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-black/[0.05] rounded-full text-[11px] text-gray-600">

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import type { ComponentType } from 'react'
 import { ImagePlus, X, DoorOpen, Luggage, Ban, Minus, Plus } from 'lucide-react'
 import type { Garment, FamilyMember, Wardrobe, Suitcase, Shelf } from '../types'
-import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS } from '../types'
+import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS, getCategoryInfo } from '../types'
 import { api } from '../api'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
 
@@ -15,8 +15,13 @@ interface Props {
   onClose: () => void
 }
 
+// Nombre automático a partir de tipo + color + marca
+export function composeName(category: string, color?: string | null, brand?: string | null) {
+  return [getCategoryInfo(category).label, (color || '').trim(), (brand || '').trim()].filter(Boolean).join(' ')
+}
+
 const defaultForm = {
-  name: '', category: 'camiseta', owner_id: '' as number | '',
+  category: 'camiseta', owner_id: '' as number | '',
   storage_type: 'wardrobe' as 'wardrobe' | 'suitcase' | 'none',
   wardrobe_id: '' as number | '', suitcase_id: '' as number | '', shelf_id: '' as number | '',
   photos: [] as string[], condition: 'buena', use_type: 'salir',
@@ -57,7 +62,6 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
   const [form, setForm] = useState(() => {
     if (!garment) return defaultForm
     return {
-      name: garment.name,
       category: garment.category,
       owner_id: garment.owner_id ?? ('' as number | ''),
       storage_type: garment.wardrobe_id ? 'wardrobe' : garment.suitcase_id ? 'suitcase' : 'none' as 'wardrobe' | 'suitcase' | 'none',
@@ -125,11 +129,10 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name.trim()) return
     setSaving(true)
     try {
       const payload: Partial<Garment> = {
-        name: form.name.trim(),
+        name: composeName(form.category, form.color, form.brand),
         category: form.category,
         owner_id: form.owner_id !== '' ? Number(form.owner_id) : null,
         wardrobe_id: form.storage_type === 'wardrobe' && form.wardrobe_id !== '' ? Number(form.wardrobe_id) : null,
@@ -226,16 +229,15 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         </div>
       </div>
 
-      {/* Name + brand */}
+      {/* Color + marca (el nombre se genera solo) */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Nombre *</label>
+          <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
           <input
             type="text"
-            required
-            value={form.name}
-            onChange={e => set('name', e.target.value)}
-            placeholder="Ej: Camiseta azul Nike"
+            value={form.color}
+            onChange={e => set('color', e.target.value)}
+            placeholder="Ej: azul marino"
             className="ios-field"
           />
         </div>
@@ -250,17 +252,8 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
           />
         </div>
       </div>
-
-      {/* Color (justo después del título) */}
-      <div>
-        <label className="block text-[13px] font-medium text-gray-500 mb-1.5">Color</label>
-        <input
-          type="text"
-          value={form.color}
-          onChange={e => set('color', e.target.value)}
-          placeholder="Ej: azul marino"
-          className="ios-field"
-        />
+      <div className="-mt-2 text-xs text-gray-400">
+        Se llamará: <span className="font-medium text-gray-600">{composeName(form.category, form.color, form.brand)}</span>
       </div>
 
       {/* Category */}
@@ -453,7 +446,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
         </button>
         <button
           type="submit"
-          disabled={saving || !form.name.trim()}
+          disabled={saving}
           className="ios-btn-primary flex-1 py-2.5 disabled:opacity-50"
         >
           {saving ? 'Guardando...' : garment ? 'Actualizar' : 'Añadir prenda'}
