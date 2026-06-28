@@ -7,8 +7,11 @@ import Modal from '../components/Modal'
 import GarmentForm from '../components/GarmentForm'
 import GarmentGrid from '../components/GarmentGrid'
 import GarmentPicker from '../components/GarmentPicker'
+import { useConfirm, usePrompt } from '../lib/confirm'
 
 export default function Wardrobes() {
+  const ask = useConfirm()
+  const askText = usePrompt()
   const [wardrobes, setWardrobes] = useState<Wardrobe[]>([])
   const [locations, setLocations] = useState<Location[]>([])
   const [members, setMembers] = useState<FamilyMember[]>([])
@@ -63,14 +66,14 @@ export default function Wardrobes() {
 
   const createShelf = async () => {
     if (!selected) return
-    const name = window.prompt('Nombre de la estantería o caja (p. ej. "Estante superior", "Caja zapatos")')
+    const name = await askText('Nueva caja o estantería', { title: 'Caja/Estante', placeholder: 'Ej: Cajón calcetines, Caja zapatos' })
     if (!name?.trim()) return
     const shelf = await api.shelves.create({ name: name.trim(), wardrobe_id: selected.id })
     setShelves(prev => [...prev, shelf])
   }
 
   const deleteShelf = async (s: Shelf) => {
-    if (!confirm(`¿Eliminar "${s.name}"? La ropa que tenga dentro quedará sin estantería.`)) return
+    if (!(await ask(`¿Eliminar "${s.name}"? La ropa que tenga dentro quedará sin estantería.`))) return
     await api.shelves.delete(s.id)
     setShelves(prev => prev.filter(x => x.id !== s.id))
     if (shelfFilter === s.id) setShelfFilter('all')
@@ -93,7 +96,7 @@ export default function Wardrobes() {
   }
 
   const handleDeleteWardrobe = async (w: Wardrobe) => {
-    if (!confirm(`¿Eliminar el armario "${w.name}"? La ropa dentro quedará sin ubicar.`)) return
+    if (!(await ask(`¿Eliminar el armario "${w.name}"? La ropa dentro quedará sin ubicar.`))) return
     await api.wardrobes.delete(w.id)
     setWardrobes(prev => prev.filter(x => x.id !== w.id))
     if (selected?.id === w.id) { setSelected(null); setGarments([]) }
@@ -112,7 +115,7 @@ export default function Wardrobes() {
   }
 
   const handleDeleteGarment = async (g: Garment) => {
-    if (!confirm(`¿Eliminar "${g.name}"?`)) return
+    if (!(await ask(`¿Eliminar "${g.name}"?`))) return
     await api.garments.delete(g.id)
     setGarments(prev => prev.filter(x => x.id !== g.id))
     setWardrobes(ws => ws.map(w => w.id === g.wardrobe_id ? { ...w, garment_count: Math.max(0, (w.garment_count || 0) - 1) } : w))

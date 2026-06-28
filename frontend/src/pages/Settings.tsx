@@ -5,6 +5,7 @@ import Modal from '../components/Modal'
 import { useAuth } from '../lib/auth'
 import { Users, MapPin, Lock, House, SquarePen, Trash2, Plus, LogOut } from 'lucide-react'
 import { RoleIcon } from '../components/icons'
+import { useConfirm } from '../lib/confirm'
 
 const COLORS = ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16']
 const ROLES = [
@@ -15,6 +16,7 @@ const ROLES = [
 ]
 
 export default function Settings() {
+  const ask = useConfirm()
   const { session, signOut } = useAuth()
   const [members, setMembers] = useState<FamilyMember[]>([])
   const [locations, setLocations] = useState<Location[]>([])
@@ -45,7 +47,7 @@ export default function Settings() {
   }
 
   const deleteMember = async (m: FamilyMember) => {
-    if (!confirm(`¿Eliminar a "${m.name}"? Sus prendas quedarán sin dueño.`)) return
+    if (!(await ask(`¿Eliminar a "${m.name}"? Sus prendas quedarán sin dueño.`))) return
     await api.members.delete(m.id)
     setMembers(prev => prev.filter(x => x.id !== m.id))
   }
@@ -66,7 +68,7 @@ export default function Settings() {
   }
 
   const deleteLocation = async (l: Location) => {
-    if (!confirm(`¿Eliminar la ubicación "${l.name}"?`)) return
+    if (!(await ask(`¿Eliminar la ubicación "${l.name}"?`))) return
     await api.locations.delete(l.id)
     setLocations(prev => prev.filter(x => x.id !== l.id))
   }

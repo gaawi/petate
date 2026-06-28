@@ -6,8 +6,10 @@ import Modal from '../components/Modal'
 import GarmentForm from '../components/GarmentForm'
 import GarmentPicker from '../components/GarmentPicker'
 import GarmentGrid from '../components/GarmentGrid'
+import { useConfirm } from '../lib/confirm'
 
 export default function Suitcases({ embedded = false }: { embedded?: boolean }) {
+  const ask = useConfirm()
   const [suitcases, setSuitcases] = useState<Suitcase[]>([])
   const [locations, setLocations] = useState<Location[]>([])
   const [members, setMembers] = useState<FamilyMember[]>([])
@@ -44,6 +46,7 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
 
   const handleSave = async () => {
     if (!form.name.trim()) return
+    if (!form.current_location_id) { await ask('Elige una ubicación para la maleta (NY o España).', { title: 'Falta la ubicación', confirmText: 'Entendido', danger: false }); return }
     if (editSuitcase) {
       const updated = await api.suitcases.update(editSuitcase.id, { name: form.name, current_location_id: Number(form.current_location_id) || null })
       setSuitcases(prev => prev.map(s => s.id === updated.id ? updated : s))
@@ -66,7 +69,7 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
   }
 
   const handleDelete = async (s: Suitcase) => {
-    if (!confirm(`¿Eliminar la maleta "${s.name}"? La ropa dentro quedará sin ubicar.`)) return
+    if (!(await ask(`¿Eliminar la maleta "${s.name}"? La ropa dentro quedará sin ubicar.`))) return
     await api.suitcases.delete(s.id)
     setSuitcases(prev => prev.filter(x => x.id !== s.id))
     if (selected?.id === s.id) { setSelected(null); setGarments([]) }
@@ -84,7 +87,7 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
   }
 
   const handleDeleteGarment = async (g: Garment) => {
-    if (!confirm(`¿Eliminar "${g.name}"?`)) return
+    if (!(await ask(`¿Eliminar "${g.name}"?`))) return
     await api.garments.delete(g.id)
     setGarments(prev => prev.filter(x => x.id !== g.id))
     setSuitcases(ss => ss.map(s => s.id === g.suitcase_id ? { ...s, garment_count: Math.max(0, (s.garment_count || 0) - 1) } : s))
@@ -103,7 +106,7 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
           ? <p className="text-sm text-gray-400 min-w-0">Tus maletas y lo que llevan dentro</p>
           : <h1 className="ios-large-title">Maletas</h1>}
         <button
-          onClick={() => { setForm({ name: '', current_location_id: '' }); setEditSuitcase(null); setShowAdd(true) }}
+          onClick={() => { setForm({ name: '', current_location_id: String(locations[0]?.id ?? '') }); setEditSuitcase(null); setShowAdd(true) }}
           className="ios-btn-primary whitespace-nowrap shrink-0"
         >
           <Plus className="w-4 h-4" />
@@ -229,13 +232,13 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación actual</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación actual (obligatoria)</label>
               <select
                 value={form.current_location_id}
                 onChange={e => setForm(f => ({ ...f, current_location_id: e.target.value }))}
                 className="ios-field"
               >
-                <option value="">Sin ubicar</option>
+                <option value="" disabled>Elige una ubicación…</option>
                 {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
               </select>
             </div>
@@ -253,12 +256,6 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
           <div className="space-y-4">
             <p className="text-sm text-gray-600">¿A dónde vas a llevar esta maleta?</p>
             <div className="space-y-2">
-              <button
-                onClick={() => setMoveTarget('')}
-                className={`w-full flex items-center gap-2 p-3 rounded-xl border text-sm text-left transition-all ${!moveTarget ? 'border-brand-300 bg-brand-50 text-brand-700' : 'border-gray-100 hover:border-gray-200'}`}
-              >
-                <MapPin className="w-4 h-4" /> Sin ubicar (en tránsito)
-              </button>
               {locations.map(l => (
                 <button
                   key={l.id}
@@ -271,7 +268,7 @@ export default function Suitcases({ embedded = false }: { embedded?: boolean }) 
             </div>
             <div className="flex gap-3">
               <button onClick={() => setShowMove(false)} className="flex-1 py-2.5 rounded-xl bg-black/[0.06] text-gray-700 font-semibold">Cancelar</button>
-              <button onClick={handleMove} className="ios-btn-primary flex-1 py-2.5">Confirmar</button>
+              <button onClick={handleMove} disabled={!moveTarget} className="ios-btn-primary flex-1 py-2.5 disabled:opacity-50">Confirmar</button>
             </div>
           </div>
         </Modal>

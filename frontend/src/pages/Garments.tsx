@@ -8,9 +8,12 @@ import GarmentForm from '../components/GarmentForm'
 import Modal from '../components/Modal'
 import { Plus, Search, ChevronDown, Shirt, LayoutGrid, Grid3x3, List } from 'lucide-react'
 
+import { useConfirm } from '../lib/confirm'
+
 type ViewMode = 'comoda' | 'densa' | 'lista'
 
 export default function Garments() {
+  const ask = useConfirm()
   const [searchParams, setSearchParams] = useSearchParams()
   const [garments, setGarments] = useState<Garment[]>([])
   const [members, setMembers] = useState<FamilyMember[]>([])
@@ -77,7 +80,7 @@ export default function Garments() {
   }
 
   const handleDelete = async (g: Garment) => {
-    if (!confirm(`¿Eliminar "${g.name}"?`)) return
+    if (!(await ask(`¿Eliminar "${g.name}"?`))) return
     await api.garments.delete(g.id)
     setGarments(prev => prev.filter(x => x.id !== g.id))
   }

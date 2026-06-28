@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { House, Shirt, DoorOpen, Plane, Settings, LogOut, Luggage } from 'lucide-react'
+import { House, Shirt, DoorOpen, Settings, LogOut, Luggage } from 'lucide-react'
 import { useAuth } from '../lib/auth'
 
 const navItems = [
   { to: '/', label: 'Inicio', Icon: House, exact: true },
   { to: '/ropa', label: 'Ropa', Icon: Shirt },
   { to: '/armarios', label: 'Armarios', Icon: DoorOpen },
-  { to: '/viajes', label: 'Viajes', Icon: Plane },
+  { to: '/maletas', label: 'Maletas', Icon: Luggage },
   { to: '/ajustes', label: 'Ajustes', Icon: Settings },
 ]
 

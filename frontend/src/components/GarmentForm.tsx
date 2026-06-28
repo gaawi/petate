@@ -5,6 +5,7 @@ import type { Garment, FamilyMember, Wardrobe, Suitcase, Shelf } from '../types'
 import { CATEGORIES, USE_TYPES, CONDITIONS, FIT_OPTIONS, SEASONS, COLORS, getCategoryInfo, getBrands, addBrand } from '../types'
 import { api } from '../api'
 import { CategoryIcon, SeasonIcon, UseTypeIcon, FitIcon } from './icons'
+import { usePrompt } from '../lib/confirm'
 
 interface Props {
   garment?: Garment
@@ -87,9 +88,10 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
   const [shelves, setShelves] = useState<Shelf[]>([])
   const [brands, setBrands] = useState<string[]>(getBrands())
   const fileRef = useRef<HTMLInputElement>(null)
+  const askText = usePrompt()
 
-  const newBrand = () => {
-    const name = window.prompt('Nueva marca')
+  const newBrand = async () => {
+    const name = await askText('Escribe la marca', { title: 'Nueva marca', placeholder: 'Ej: Decathlon' })
     if (!name?.trim()) return
     addBrand(name)
     setBrands(getBrands())
@@ -108,7 +110,7 @@ export default function GarmentForm({ garment, members, wardrobes, suitcases, on
   }, [form.storage_type, form.wardrobe_id])
 
   const createShelf = async () => {
-    const name = window.prompt('Nombre de la estantería o caja (p. ej. "Estante superior", "Caja zapatos")')
+    const name = await askText('Nueva caja o estantería', { title: 'Caja/Estante', placeholder: 'Ej: Cajón calcetines' })
     if (!name?.trim() || form.wardrobe_id === '') return
     const shelf = await api.shelves.create({ name: name.trim(), wardrobe_id: Number(form.wardrobe_id) })
     setShelves(prev => [...prev, shelf])
